@@ -1,3 +1,4 @@
+from os import set_inheritable
 import sqlite3
 import re
 
@@ -121,8 +122,26 @@ def lobbies():
         #game_id_querie  = cur.execute("SELECT game FROM games WHERE lobbies.id = :id", {"id": ???})  
         #lst = cur.fetchall()  # ???
         lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
-        join_lobby = ("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
+        join_lobby = cur.execute("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
 
-# User reached route via GET (as by clicking a link or via redirect)
+        # gets usernames in specific game lobby
+        usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
+
+# User reached route via GET (as by clicking a link or via redirect); show him relevant users from the databese
     else:
-        return render_template("/lobbies.html")
+        # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+        con = sqlite3.connect('teammaker.db')
+        # create "cursor" object
+        cur = con.cursor()
+
+        lobby_id = cur.execute("SELECT id FROM lobbies")
+        lobby_users = cur.execute("SELECT user_id FROM lobbies")
+        print("MYDEBUG lobby_id type -", type(lobby_id))
+        
+
+        return render_template("/lobbies.html", lobby_id = lobby_id, lobby_users = lobby_users)
+
+
+# def join_lobby:
+#     lobby_lst = SELECT foo
+#     return lobby_lst
