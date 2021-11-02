@@ -127,19 +127,28 @@ def lobbies():
         # gets usernames in specific game lobby
         usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
 
-# User reached route via GET (as by clicking a link or via redirect); show him relevant users from the databese
+    # User reached route via GET (as by clicking a link or via redirect); show him relevant users from the databese
     else:
         # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
         con = sqlite3.connect('teammaker.db')
         # create "cursor" object
         cur = con.cursor()
 
-        lobby_id = cur.execute("SELECT id FROM lobbies")
-        lobby_users = cur.execute("SELECT user_id FROM lobbies")
-        print("MYDEBUG lobby_id type -", type(lobby_id))
-        
+        # test strings
+        # lobby_id = cur.execute("SELECT id FROM lobbies")
+        # lobby_users = cur.execute("SELECT user_id FROM lobbies")
+        # print("MYDEBUG lobby_id type -", type(lobby_id))
 
-        return render_template("/lobbies.html", lobby_id = lobby_id, lobby_users = lobby_users)
+        # .fetchall returns a list, result of .execute; cursor object can also be iterated
+        all_lobbies_and_users = cur.execute("""SELECT games.game, users.username
+                            FROM games
+                            JOIN lobbies ON games.id = lobbies.game_id
+                            JOIN users ON users.id = lobbies.user_id
+                            """)#.fetchall()
+
+        # whecn should I con.close() ??? probably should just use "with ... as ..."
+        return render_template("/lobbies.html", all_lobbies_and_users = all_lobbies_and_users)
+
 
 
 # def join_lobby:

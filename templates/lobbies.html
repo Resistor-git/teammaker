@@ -5,22 +5,14 @@
 {% endblock title %}
 
 {% block main%}
-    <!-- {% for row in usernames %}
+    <p>{{ all_lobbies_and_users }}</p>
+    {% for row in all_lobbies_and_users %}
+        <!-- game's name (= lobby's name) -->
+        <p>{{ row[0] }}</p>
+         <!-- players' names -->
         <ul>
-            <li>{{ username }}</li>
-        </ul>
-    {% endfor %} -->
-    {% for foo in lobby_id %}
-        <ul>
-            <li>{{ foo }}</li>
-        </ul>
-    {% endfor %}
-        dick (can't show the beneath part if the above part exists in code)
-    {% for foo in lobby_users %}
-        <ul>
-            <li>lobby_users {{ foo }}</li>
+            <li>{{ row[1] }}</li>
         </ul>
     {% endfor %}
-    
 
-{% endblock main %}
+    {% endblock main %}
