@@ -2,7 +2,7 @@ from os import set_inheritable
 import sqlite3
 import re
 
-from flask import Flask, redirect, request, render_template, session
+from flask import Flask, flash, redirect, request, render_template, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -23,7 +23,7 @@ Session(app)
 
 @app.route("/")
 def index():
-    return redirect("/register")
+    return redirect("/lobbies")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -105,36 +105,98 @@ def register():
         return render_template("/register.html")
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Log user in"""
+
+    # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+    con = sqlite3.connect('teammaker.db')
+    # create "cursor" object
+    cur = con.cursor()
+
+    # Forget any user_id
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return "must provide username"
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return "must provide password"
+
+        # Query database for username ???ЧТО ОНО ВОЗВРАЩАЕТ???
+        search_for_username = cur.execute("SELECT * FROM users WHERE username = :username", {"username" : request.form.get("username")}).fetchall()
+        print("MYDEBUG", search_for_username)
+
+        # Ensure username exists and password is correct
+        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; check_password_hash [password_hash, provided password] - returns True or False
+        if not search_for_username or not check_password_hash(search_for_username[0][2], request.form.get("password")):
+            return "invalid username and/or password"
+
+        #TEST STRINGS
+        # if not search_for_username:
+        #     return "invalid username"
+        # if not check_password_hash(search_for_username[0][2], request.form.get("password")):
+        #     return "wrong password"
+
+        # Remember which user has logged in
+        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; so [0][0] is user's id from database table "users"
+        session["user_id"] = search_for_username[0][0]
+
+        # Show message
+        flash('You were successfully logged in')
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Clear any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
+
+
 @app.route("/lobbies", methods=["GET", "POST"])
 def lobbies():
     """Shows lobbies and allows to join them"""
     # TODO
-    # User reached route via POST; submits which lobby be wants to join
+    # User reached route via POST; allows user to join the lobby
     if request.method == "POST":
-        # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+        # ???do i need it here??? create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
         con = sqlite3.connect('teammaker.db')
-        # create "cursor" object
+        # ???do i need it here??? create "cursor" object
         cur = con.cursor()
 
         user_id = session["user_id"]
         # ??? how do i get game_id from submit? <input type="hidden" id="game_id" name="game_id" value="1"> ?
         game_id = request.form.get("game_id")
-        #game_id_querie  = cur.execute("SELECT game FROM games WHERE lobbies.id = :id", {"id": ???})  
-        #lst = cur.fetchall()  # ???
-        lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
+        #lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
         join_lobby = cur.execute("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
 
-        # gets usernames in specific game lobby
-        usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
+        # # gets usernames in specific game lobby
+        # usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
 
-    # User reached route via GET (as by clicking a link or via redirect); show him relevant users from the databese
+    # User reached route via GET (as by clicking a link or via redirect); show all lobbies and users in them
     else:
         # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
         con = sqlite3.connect('teammaker.db')
         # create "cursor" object
         cur = con.cursor()
 
-        # .fetchall returns a list, result of .execute; cursor object can also be iterated
+        # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
         all_lobbies_and_users = cur.execute("""
                                             SELECT games.game, users.username
                                             FROM games
@@ -168,8 +230,7 @@ def lobbies():
         # print("MYDEBUG lobby_id type -", type(lobby_id))
 
         # when should I con.close() ??? probably should just use "with ... as ..."
-        return render_template("/lobbies.html", users_in_lobbies_dict= users_in_lobbies_dict)
-
+        return render_template("/lobbies.html", users_in_lobbies_dict = users_in_lobbies_dict)
 
 
 # def join_lobby:
