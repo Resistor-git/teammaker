@@ -134,20 +134,41 @@ def lobbies():
         # create "cursor" object
         cur = con.cursor()
 
+        # .fetchall returns a list, result of .execute; cursor object can also be iterated
+        all_lobbies_and_users = cur.execute("""
+                                            SELECT games.game, users.username
+                                            FROM games
+                                            JOIN lobbies ON games.id = lobbies.game_id
+                                            JOIN users ON users.id = lobbies.user_id
+                                            """).fetchall()
+
+        # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
+        users_in_lobbies_dict = {}
+        for row in all_lobbies_and_users:
+            if row[0] not in users_in_lobbies_dict.keys():
+                users_in_lobbies_dict[row[0]] = [row[1]]
+            else:
+                users_in_lobbies_dict[row[0]].append(row[1])
+
+        # games_ids = cur.execute("SELECT id FROM games").fetchall()
+        # print("mydebug", games_ids)
+        # for id in games_ids:
+        #     print("mydebug id=", id)
+        #     game_id = id[0]
+        #     print("mydebug game_id", game_id)
+        #     users_of_the_lobby = cur.execute("""
+        #                                     SELECT users.username
+        #                                     FROM users
+        #                                     WHERE users.id IN (SELECT lobbies.user_id FROM lobbies WHERE lobbies.game_id = :game_id)
+        #                                     """, {"game_id" : game_id}).fetchall()
+        
         # test strings
         # lobby_id = cur.execute("SELECT id FROM lobbies")
         # lobby_users = cur.execute("SELECT user_id FROM lobbies")
         # print("MYDEBUG lobby_id type -", type(lobby_id))
 
-        # .fetchall returns a list, result of .execute; cursor object can also be iterated
-        all_lobbies_and_users = cur.execute("""SELECT games.game, users.username
-                            FROM games
-                            JOIN lobbies ON games.id = lobbies.game_id
-                            JOIN users ON users.id = lobbies.user_id
-                            """)#.fetchall()
-
-        # whecn should I con.close() ??? probably should just use "with ... as ..."
-        return render_template("/lobbies.html", all_lobbies_and_users = all_lobbies_and_users)
+        # when should I con.close() ??? probably should just use "with ... as ..."
+        return render_template("/lobbies.html", users_in_lobbies_dict= users_in_lobbies_dict)
 
 
 

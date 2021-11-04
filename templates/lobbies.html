@@ -5,14 +5,26 @@
 {% endblock title %}
 
 {% block main%}
-    <p>{{ all_lobbies_and_users }}</p>
-    {% for row in all_lobbies_and_users %}
-        <!-- game's name (= lobby's name) -->
-        <p>{{ row[0] }}</p>
-         <!-- players' names -->
+            
+    <!-- TODO: rewrite code to execute it clientside
+    js should take dict/list/cursor object [(game1, users), (game2, users)...] from server and manipulate it -->
+    
+    {% for lobby in users_in_lobbies_dict %}
+        <p>{{ lobby }}</p>
         <ul>
-            <li>{{ row[1] }}</li>
+            <li>{{ users_in_lobbies_dict[lobby] }}</li>
         </ul>
     {% endfor %}
 
-    {% endblock main %}
+    <!-- <p>{{ all_lobbies_and_users }}</p>
+    {% for row in all_lobbies_and_users %} -->
+        <!-- game's name (= lobby's name) -->
+        <!-- <p>{{ row[0] }}</p> -->
+         <!-- players' names -->
+        <!-- <ul>
+            <li>{{ row[1] }}</li>
+        </ul>
+    {% endfor %} -->
+    <!-- <p>{{ users_of_the_lobby }}</p> -->
+
+{% endblock main %}
