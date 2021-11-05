@@ -32,10 +32,21 @@
             <li>{{ users_in_lobbies_dict[game] }}</li>
         </ul>
         <form action="/lobbies" method="POST">
-            <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have quotes "" for the variable -->
+            <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have both quotes and curly braces -->
             <button class="btn-primary" type="submit">Join lobby</button>
         </form>
-
+        <div>
+            <form action="/leave_lobby" method="POST">
+                <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have both quotes and curly braces -->
+                <button class="btn-primary" type="submit">Leave lobby</button>
+            </form>
+        </div>
     {% endfor %}
+
+    <div>
+        <form action="/leave_all_lobbies" method="POST">
+            <button class="btn-primary" type="submit">Leave all lobbies</button>
+        </form>
+    </div>
 
 {% endblock main %}

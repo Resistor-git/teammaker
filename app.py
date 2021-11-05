@@ -1,4 +1,4 @@
-from os import set_inheritable
+# from os import set_inheritable
 import sqlite3
 import re
 
@@ -7,6 +7,8 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import redirect
+
+from helpers import login_required
 
 # Configure application
 app = Flask(__name__)
@@ -99,7 +101,7 @@ def register():
         # also, could use "with foo as bar:"
         con.close()
 
-        return "todo /mainpage"
+        return redirect("/")
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("/register.html")
@@ -189,7 +191,7 @@ def lobbies():
             flash("In order to join lobby you must be logged in")  # for some reason this line doesn't work
             return redirect("/login")
 
-        game_id = request.form.get("game_id")
+        #game_id = request.form.get("game_id")
         game = request.form.get("game")
 
         #lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
@@ -245,6 +247,32 @@ def lobbies():
         return render_template("/lobbies.html", games_names = games_names, users_in_lobbies_dict = users_in_lobbies_dict)
 
 
-# def join_lobby:
-#     lobby_lst = SELECT foo
-#     return lobby_lst
+@app.route("/leave_lobby", methods=["POST"])
+@login_required
+def leave_lobby():
+    """Leave one particular lobby"""
+
+    con = sqlite3.connect('teammaker.db')
+    user_id = session["user_id"]
+    # get name of the game from html and convert it to game_id from db;
+    # fetchall() returns list of tuples [(id,)]
+    game_id = con.execute("SELECT id FROM games WHERE game = :game", {"game" : request.form.get("game")}).fetchall()[0][0]
+
+    # connection as a context manager automatically calls con.commit() if transaction was succesfull
+    with con:
+        con.execute("DELETE FROM lobbies WHERE user_id = :user_id AND game_id = :game_id", {"user_id" : user_id, "game_id" : game_id})
+        flash(f"You left the lobby {request.form.get('game')}")  # could be used for sql injection (returning malicious code in "value" from lobbies.html)? 
+        return redirect("/lobbies")
+
+
+@app.route("/leave_all_lobbies", methods=["POST"])
+@login_required
+def leave_all_lobbies():
+    """Leave all lobbies"""
+
+    user_id = session["user_id"]
+    con = sqlite3.connect('teammaker.db')
+    with con:
+        con.execute("DELETE FROM lobbies WHERE user_id = :user_id", {"user_id" : user_id})
+        flash("You left all lobbies")
+        return redirect("/lobbies")
