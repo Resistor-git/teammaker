@@ -63,7 +63,7 @@ def register():
             cur.execute("SELECT * FROM users WHERE login = :login", {"login": login})  # same as: (...login = ?", (login,)) - yep, comma is nesessary 
             # .fetchall returns a list, result of .execute
             lst = cur.fetchall()
-            print("MYDEBUG. lst (login) =", lst)
+            # print("MYDEBUG. lst (login) =", lst)
             if lst == []:
                 # check password with regex: only allowed symbols, at least 4 of them, maximum 20 symbols
                 if re.fullmatch(r'[A-Za-z0-9@#$%^&+=]{4,20}', password):
@@ -78,7 +78,7 @@ def register():
                         cur.execute("SELECT * FROM users WHERE username = ?", (username,))  # same as: (... username = :foo", {"foo": username}) ; https://docs.python.org/3/library/sqlite3.html
                         # .fetchall returns a list, result of .execute
                         lst = cur.fetchall()
-                        print("MYDEBUG. lst (username) =", lst)
+                        # print("MYDEBUG. lst (username) =", lst)
                         if lst == []:
                             # create a row in database
                             cur.execute("INSERT INTO users (login, password_hash, username) VALUES (?, ?, ?)", (login, password_hash, username))
@@ -128,12 +128,12 @@ def login():
         elif not request.form.get("password"):
             return "must provide password"
 
-        # Query database for username ???ЧТО ОНО ВОЗВРАЩАЕТ???
+        # Query database for username
         search_for_username = cur.execute("SELECT * FROM users WHERE username = :username", {"username" : request.form.get("username")}).fetchall()
-        print("MYDEBUG", search_for_username)
+        # print("MYDEBUG", search_for_username)
 
         # Ensure username exists and password is correct
-        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; check_password_hash [password_hash, provided password] - returns True or False
+        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; check_password_hash returns True or False (password_hash, provided password)
         if not search_for_username or not check_password_hash(search_for_username[0][2], request.form.get("password")):
             return "invalid username and/or password"
 
@@ -172,22 +172,38 @@ def logout():
 @app.route("/lobbies", methods=["GET", "POST"])
 def lobbies():
     """Shows lobbies and allows to join them"""
-    # TODO
+    
     # User reached route via POST; allows user to join the lobby
     if request.method == "POST":
+        # if anytime I would want to allow the user to join only one lobby - change "lobbies" table in DB - make "user_id" UNIQUE
+
         # ???do i need it here??? create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
         con = sqlite3.connect('teammaker.db')
         # ???do i need it here??? create "cursor" object
         cur = con.cursor()
 
-        user_id = session["user_id"]
-        # ??? how do i get game_id from submit? <input type="hidden" id="game_id" name="game_id" value="1"> ?
+        try:
+            user_id = session["user_id"]
+            # ??? how do i get game_id from submit? <input type="hidden" id="game_id" name="game_id" value="1"> ?
+        except KeyError:
+            flash("In order to join lobby you must be logged in")  # for some reason this line doesn't work
+            return redirect("/login")
+
         game_id = request.form.get("game_id")
+
         #lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
-        join_lobby = cur.execute("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
+
+        # user is already in the lobby if inquiry returns anything except an empty list 
+        if cur.execute("SELECT * FROM lobbies WHERE user_id = ? AND game_id = ?", (user_id, game_id)).fetchall() != []:
+            flash("You are already in the lobby")
+        else:
+            join_lobby = cur.execute("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
+            con.commit()
 
         # # gets usernames in specific game lobby
         # usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
+
+        return redirect("/lobbies")
 
     # User reached route via GET (as by clicking a link or via redirect); show all lobbies and users in them
     else:

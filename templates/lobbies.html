@@ -6,25 +6,25 @@
 
 {% block main%}
             
-    <!-- TODO: rewrite code to execute it clientside
+    <!-- TODO: maybe rewrite code to execute it clientside?
     js should take dict/list/cursor object [(game1, users), (game2, users)...] from server and manipulate it -->
     
+    <!-- shows all users in all games/lobbies -->
     {% for lobby in users_in_lobbies_dict %}
+        <!-- lobby's name -->
         <p>{{ lobby }}</p>
+        <!-- list of players -->
         <ul>
             <li>{{ users_in_lobbies_dict[lobby] }}</li>
         </ul>
+        <!-- join the lobby button -->
+        <form action="/lobbies" method="POST">
+            <input type="hidden" id="game_id" name="game_id" value="1"> <!-- value=1 IS JUST FOR TESTING-->
+            <button class="btn-primary" type="submit">Join lobby</button>
+        </form>
     {% endfor %}
 
-    <!-- <p>{{ all_lobbies_and_users }}</p>
-    {% for row in all_lobbies_and_users %} -->
-        <!-- game's name (= lobby's name) -->
-        <!-- <p>{{ row[0] }}</p> -->
-         <!-- players' names -->
-        <!-- <ul>
-            <li>{{ row[1] }}</li>
-        </ul>
-    {% endfor %} -->
-    <!-- <p>{{ users_of_the_lobby }}</p> -->
+    
+
 
 {% endblock main %}

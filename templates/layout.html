@@ -52,6 +52,17 @@
             </header>
         {% endif %}
 
+        <!-- alternative to the lines above, default lines from flask docs: -->
+        <!-- {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+        {% endwith %} -->
+
         <main class="container p-5">
             {% block main %}{% endblock %}
         </main>
@@ -70,5 +81,5 @@
 </html>
 
 <!--As far as I understand, "|" in {{ get_flashed_messages() | join(" ") }} act kinda as a pipeline in command line https://en.wikipedia.org/wiki/Pipeline_(Unix)-->
-<!--It takes the left part and combine it with the right.-->
+<!--It takes the left part and combines it with the right.-->
 <!--Or it's filter from Jinja, although I don't understand what it actually means-->
