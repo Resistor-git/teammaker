@@ -190,16 +190,24 @@ def lobbies():
             return redirect("/login")
 
         game_id = request.form.get("game_id")
+        game = request.form.get("game")
 
         #lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
 
-        # user is already in the lobby if inquiry returns anything except an empty list 
-        if cur.execute("SELECT * FROM lobbies WHERE user_id = ? AND game_id = ?", (user_id, game_id)).fetchall() != []:
-            flash("You are already in the lobby")
+        # user is already in the lobby if inquiry returns anything except an empty list;
+        # here we take user's id and game's name, then check if both are already in the lobby table at the same line
+        if cur.execute("""
+                        SELECT * FROM lobbies
+                        WHERE user_id = :user_id AND game_id = (SELECT games.id FROM games WHERE games.game = :game)
+                        """, {"user_id" : user_id, "game" : game }).fetchall() != []:
+                        flash("You are already in the lobby")
         else:
-            join_lobby = cur.execute("INSERT INTO lobbies (user_id, game_id) VALUES (?, ?)", (user_id, game_id))
+            join_lobby = cur.execute("""
+                                    INSERT INTO lobbies (user_id, game_id)
+                                    VALUES (:user_id, (SELECT id FROM games WHERE game = :game))
+                                    """, {"user_id" : user_id, "game" : game})
             con.commit()
-
+        
         # # gets usernames in specific game lobby
         # usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
 
@@ -220,6 +228,11 @@ def lobbies():
                                             JOIN users ON users.id = lobbies.user_id
                                             """).fetchall()
 
+        # list of all games/lobbies (need that to show empty lobbies)
+        raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
+        games_names = []
+        foo = [games_names.append(key[0]) for key in raw_games_names]
+
         # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
         users_in_lobbies_dict = {}
         for row in all_lobbies_and_users:
@@ -228,25 +241,8 @@ def lobbies():
             else:
                 users_in_lobbies_dict[row[0]].append(row[1])
 
-        # games_ids = cur.execute("SELECT id FROM games").fetchall()
-        # print("mydebug", games_ids)
-        # for id in games_ids:
-        #     print("mydebug id=", id)
-        #     game_id = id[0]
-        #     print("mydebug game_id", game_id)
-        #     users_of_the_lobby = cur.execute("""
-        #                                     SELECT users.username
-        #                                     FROM users
-        #                                     WHERE users.id IN (SELECT lobbies.user_id FROM lobbies WHERE lobbies.game_id = :game_id)
-        #                                     """, {"game_id" : game_id}).fetchall()
-        
-        # test strings
-        # lobby_id = cur.execute("SELECT id FROM lobbies")
-        # lobby_users = cur.execute("SELECT user_id FROM lobbies")
-        # print("MYDEBUG lobby_id type -", type(lobby_id))
-
         # when should I con.close() ??? probably should just use "with ... as ..."
-        return render_template("/lobbies.html", users_in_lobbies_dict = users_in_lobbies_dict)
+        return render_template("/lobbies.html", games_names = games_names, users_in_lobbies_dict = users_in_lobbies_dict)
 
 
 # def join_lobby:
