@@ -29,7 +29,9 @@
         <p>{{ game }}</p>
         <!-- list of players -->
         <ul>
-            <li>{{ users_in_lobbies_dict[game] }}</li>
+            {% for user in users_in_lobbies_dict[game] %}
+                <li>{{ user }}</li>
+            {% endfor %}
         </ul>
         <form action="/lobbies" method="POST">
             <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have both quotes and curly braces -->
