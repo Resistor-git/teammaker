@@ -2,7 +2,7 @@
 import sqlite3
 import re
 
-from flask import Flask, flash, redirect, request, render_template, session
+from flask import Flask, flash, jsonify, redirect, request, render_template, session
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -104,6 +104,7 @@ def register():
         return redirect("/")
     # User reached route via GET (as by clicking a link or via redirect)
     else:
+        con.close()
         return render_template("/register.html")
 
 
@@ -153,10 +154,12 @@ def login():
         flash('You were successfully logged in')
 
         # Redirect user to home page
+        con.close()
         return redirect("/")
-
+        
     # User reached route via GET (as by clicking a link or via redirect)
     else:
+        con.close()
         return render_template("login.html")
 
 
@@ -212,7 +215,7 @@ def lobbies():
         
         # # gets usernames in specific game lobby
         # usernames = cur.execute("SELECT username FROM users WHERE id IN (SELECT id FROM lobbies WHERE lobbies.user_id = users.id AND game_id = :game_id)", {"game_id" : game_id})
-
+        con.close()
         return redirect("/lobbies")
 
     # User reached route via GET (as by clicking a link or via redirect); show all lobbies and users in them
@@ -236,6 +239,7 @@ def lobbies():
         foo = [games_names.append(key[0]) for key in raw_games_names]
 
         # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
+        # probably there is an easier way using jsonify
         users_in_lobbies_dict = {}
         for row in all_lobbies_and_users:
             if row[0] not in users_in_lobbies_dict.keys():
@@ -243,7 +247,8 @@ def lobbies():
             else:
                 users_in_lobbies_dict[row[0]].append(row[1])
 
-        # when should I con.close() ??? probably should just use "with ... as ..."
+        # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
+        con.close()
         return render_template("/lobbies.html", games_names = games_names, users_in_lobbies_dict = users_in_lobbies_dict)
 
 
@@ -258,12 +263,17 @@ def leave_lobby():
     # fetchall() returns list of tuples [(id,)]
     game_id = con.execute("SELECT id FROM games WHERE game = :game", {"game" : request.form.get("game")}).fetchall()[0][0]
 
-    # connection as a context manager automatically calls con.commit() if transaction was succesfull
-    with con:
-        con.execute("DELETE FROM lobbies WHERE user_id = :user_id AND game_id = :game_id", {"user_id" : user_id, "game_id" : game_id})
-        flash(f"You left the lobby {request.form.get('game')}")  # could be used for sql injection (returning malicious code in "value" from lobbies.html)? 
-        return redirect("/lobbies")
-
+    # if everything is fine code in "try" is executed and transaction is commited, if something goes wrong "with" rolls db back; "finally" closes db and is executed either way
+    try:
+        # connection as a context manager automatically calls con.commit() if transaction was succesfull
+        with con:
+            con.execute("DELETE FROM lobbies WHERE user_id = :user_id AND game_id = :game_id", {"user_id" : user_id, "game_id" : game_id})
+            flash(f"You left the lobby {request.form.get('game')}")  # could be used for sql injection (returning malicious code in "value" from lobbies.html)?
+            # can't put "con.close()" here, because "with" still uses the db
+            return redirect("/lobbies")
+    finally:
+        con.close()
+        
 
 @app.route("/leave_all_lobbies", methods=["POST"])
 @login_required
@@ -272,7 +282,49 @@ def leave_all_lobbies():
 
     user_id = session["user_id"]
     con = sqlite3.connect('teammaker.db')
-    with con:
-        con.execute("DELETE FROM lobbies WHERE user_id = :user_id", {"user_id" : user_id})
-        flash("You left all lobbies")
-        return redirect("/lobbies")
+    
+    # if everything is fine code in "try" is executed and transaction is commited, if something goes wrong "with" rolls db back; "finally" closes db and is executed either way
+    try:
+        # connection as a context manager automatically calls con.commit() if transaction was succesfull
+        with con:
+            con.execute("DELETE FROM lobbies WHERE user_id = :user_id", {"user_id" : user_id})
+            flash("You left all lobbies")
+            return redirect("/lobbies")
+    finally:
+        con.close()
+
+
+@app.route("/lobby_updater", methods=["GET"])
+def lobby_updater():
+    """Creates json for javascript to automatically update lobbies"""
+    
+    # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+    con = sqlite3.connect('teammaker.db')
+    # create "cursor" object
+    cur = con.cursor()
+
+    # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
+    all_lobbies_and_users = cur.execute("""
+                                        SELECT games.game, users.username
+                                        FROM games
+                                        JOIN lobbies ON games.id = lobbies.game_id
+                                        JOIN users ON users.id = lobbies.user_id
+                                        """).fetchall()
+
+    # list of all games/lobbies (need that to show empty lobbies)
+    raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
+    games_names = []
+    foo = [games_names.append(key[0]) for key in raw_games_names]
+
+    # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
+    # probably there is an easier way using jsonify
+    users_in_lobbies_dict = {}
+    for row in all_lobbies_and_users:
+        if row[0] not in users_in_lobbies_dict.keys():
+            users_in_lobbies_dict[row[0]] = [row[1]]
+        else:
+            users_in_lobbies_dict[row[0]].append(row[1])
+
+    # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
+    con.close()
+    return jsonify(users_in_lobbies_dict)
