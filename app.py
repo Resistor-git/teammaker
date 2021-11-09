@@ -294,10 +294,9 @@ def leave_all_lobbies():
         con.close()
 
 
-@app.route("/lobby_updater", methods=["GET"])
 def lobby_updater():
     """Creates json for javascript to automatically update lobbies"""
-    
+
     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
     con = sqlite3.connect('teammaker.db')
     # create "cursor" object
@@ -327,4 +326,54 @@ def lobby_updater():
 
     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
     con.close()
-    return jsonify(users_in_lobbies_dict)
+    return jsonify(users_in_lobbies_dict = users_in_lobbies_dict, games_names = games_names)
+
+
+@app.route("/lobbies_names", methods=["GET"])
+def lobbies_names():
+    """Creates json for javascript with only names of lobbies (empty encluded)"""
+    
+    # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+    con = sqlite3.connect('teammaker.db')
+    # create "cursor" object
+    cur = con.cursor()
+
+    # list of all games/lobbies (need that to show empty lobbies)
+    raw_lobbys_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
+    lobbies_names = []
+    foo = [lobbies_names.append(key[0]) for key in raw_lobbys_names]
+
+    # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
+    con.close()
+    return jsonify(lobbies_names = lobbies_names)
+
+
+@app.route("/lobbies_users", methods=["GET"])
+def lobbies_users():
+    """Creates json for javascript with users in lobbies {game1 : [user1, user2], game2 : [user3, user4]}"""
+
+    # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+    con = sqlite3.connect('teammaker.db')
+    # create "cursor" object
+    cur = con.cursor()
+
+    # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
+    all_lobbies_and_users = cur.execute("""
+                                        SELECT games.game, users.username
+                                        FROM games
+                                        JOIN lobbies ON games.id = lobbies.game_id
+                                        JOIN users ON users.id = lobbies.user_id
+                                        """).fetchall()
+
+    # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
+    # probably there is an easier way using jsonify
+    lobbies_users = {}
+    for row in all_lobbies_and_users:
+        if row[0] not in lobbies_users.keys():
+            lobbies_users[row[0]] = [row[1]]
+        else:
+            lobbies_users[row[0]].append(row[1])
+
+    # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
+    con.close()
+    return jsonify(lobbies_users = lobbies_users)
