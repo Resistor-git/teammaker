@@ -11,51 +11,21 @@
     document.createElement https://youtu.be/x5trGVMKTdY?list=PLhQjrBD2T380xvFSUmToMMzERZ3qB5Ueu&t=4245-->
     
 
-    <!-- js https://www.youtube.com/watch?v=x5trGVMKTdY&t=5382s https://developer.mozilla.org/ru/docs/Web/API/Fetch_API/Using_Fetch -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch("/lobby_updater")
-            .then(response => response.json())
-            .then(data => {
-                //console.log(data)
-                const lobbies_data = data;
-                //console.log(test)
 
-                // document.getElementById("test").innerHTML = function() {
-                //     for(var key in test){
-                //         console.log(key);
-                //     }
-
-                // };
-                for(var lobby in lobbies_data) {
-                    console.log(lobby);
-                    console.log(lobbies_data[lobby])
-                    // create html element with name of the lobby(game)
-                    var lobby_name = document.createElement("p");
-                    lobby_name.innerText = lobby;
-                    document.getElementById("lobby_name").appendChild(lobby_name);
-                    // create <ul> with users in lobby
-                    lobbies_data[lobby].forEach(element => {
-                        var list_of_users_in_lobby = document.createElement("li");
-                        var user_in_lobby = document.createTextNode(lobbies_data[lobby]);
-                        list_of_users_in_lobby.appendChild(user_in_lobby);
-                        document.getElementById("autoupdated_lobby").appendChild(list_of_users_in_lobby)
-                    });
-
-                }
-
-            });
-        });
-    </script>
-
-    <p id="lobby_name"></p>
+    <!-- <p id="lobby_name"></p>
     <ul id="autoupdated_lobby">
         <li></li>
-    </ul>
+    </ul> -->
+
+    <div id="lobbies_names">
+    </div>
+
+    <!-- stable code -->
     
    {% for game in games_names %}
         <!-- lobby's name -->
-        <p>{{ game }}</p>
+        <!-- id is stripped from spaces -->
+        <p id={{ game.replace(" ", "") }}>{{ game }}</p>
         <!-- list of players -->
         <ul>
             {% for user in users_in_lobbies_dict[game] %}

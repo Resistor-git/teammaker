@@ -78,6 +78,7 @@
         
 
         <!-- lobbies names -->
+        <!-- MOVE TO LOBBIES (EITHER SCRIPT WORKS ON OTHER PAGES) -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script>
             function lobbies_names() {
@@ -92,8 +93,8 @@
                         tag.setAttribute("id", el);
                         var lobby_name = document.createTextNode(el);
                         tag.appendChild(lobby_name);
-                        var element = document.getElementById("lobbies_names");
-                        element.appendChild(tag);
+                        var lobby_name_element = document.getElementById("lobbies_names");
+                        lobby_name_element.appendChild(tag);
                         // var foo = document.createElement("ul");
                         // var bar = document.createElement("li");
                         // var qqq = document.createTextNode("zzz");
@@ -109,25 +110,30 @@
                 fetch("/lobbies_users")
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
+                    // console.log(data)
                     // console.log(data.lobbies_users)
                     // console.log(data.lobbies_users.Overwatch)
 
                     $.each(data.lobbies_users, function(key, value) {
                         // console.log(key)
                         // console.log(value)
-                        // find the element containing lobby name
-                        var element = document.getElementById(key);
-                        element.insertAdjacentHTML('afterend', `<ul><li>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
 
-                        // var tag_ul = document.createElement("ul");
-                        // var tag_li = document.createElement("li");
-                        // var li_value = document.createTextNode("zzz");
-                        // var element = document.getElementById("???");
-                        // tag_ul.appendChild(tag_li);
-                        // tag_li.appendChild(li_value)
-                        // element.appendChild(tag_ul); 
-                        
+                        id_without_spaces = key.replace(/ /g, '');
+
+                        try {
+                            var list_of_players = document.getElementById(id_without_spaces + '_ul');
+                            console.log(list_of_players)
+                            list_of_players.remove()
+                            // console.log(list_of_players.innerHTML)
+                        }
+                        catch(e){
+                            console.log("error")
+                        }
+
+                        // lobby_name_element is the name of the lobby, <p>Overwatch</p>
+                        // .insertAdjacentHTML creates <ul> and <li> with usernames after <p>
+                        var lobby_name_element = document.getElementById(key);
+                        lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}><li>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
 
                     });
                 })
@@ -145,7 +151,7 @@
 
             document.addEventListener("DOMContentLoaded", lobbies_names); // порядок вызова lobbie_names и lobbies_users не перепутать
             document.addEventListener("DOMContentLoaded", lobbies_users);
-            //setInterval(lobby_updater, 1000);
+            setInterval(lobbies_users, 1000);
         </script>
     
     </body>
