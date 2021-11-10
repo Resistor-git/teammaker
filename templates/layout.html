@@ -75,85 +75,9 @@
         <!-- Optional JavaScript -->
         <!-- Option 1: Bootstrap Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-        
 
-        <!-- lobbies names -->
-        <!-- MOVE TO LOBBIES (EITHER SCRIPT WORKS ON OTHER PAGES) -->
+        <!-- jquery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script>
-            function lobbies_names() {
-                fetch("/lobbies_names")
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data)
-                    //console.log(data.lobbies_names)
-                    for (el of data.lobbies_names){
-                        // console.log(el)
-                        var tag = document.createElement("p");
-                        tag.setAttribute("id", el);
-                        var lobby_name = document.createTextNode(el);
-                        tag.appendChild(lobby_name);
-                        var lobby_name_element = document.getElementById("lobbies_names");
-                        lobby_name_element.appendChild(tag);
-                        // var foo = document.createElement("ul");
-                        // var bar = document.createElement("li");
-                        // var qqq = document.createTextNode("zzz");
-                        // foo.appendChild(bar);
-                        // bar.appendChild(qqq)
-                        // element.appendChild(foo);
-                    }
-
-                })
-            }
-
-            function lobbies_users(){
-                fetch("/lobbies_users")
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data)
-                    // console.log(data.lobbies_users)
-                    // console.log(data.lobbies_users.Overwatch)
-
-                    $.each(data.lobbies_users, function(key, value) {
-                        // console.log(key)
-                        // console.log(value)
-
-                        id_without_spaces = key.replace(/ /g, '');
-
-                        try {
-                            var list_of_players = document.getElementById(id_without_spaces + '_ul');
-                            console.log(list_of_players)
-                            list_of_players.remove()
-                            // console.log(list_of_players.innerHTML)
-                        }
-                        catch(e){
-                            console.log("error")
-                        }
-
-                        // lobby_name_element is the name of the lobby, <p>Overwatch</p>
-                        // .insertAdjacentHTML creates <ul> and <li> with usernames after <p>
-                        var lobby_name_element = document.getElementById(key);
-                        lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}><li>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
-
-                    });
-                })
-                    
-                    // var tag_ul = document.createElement("ul");
-                    // var tag_li = document.createElement("li");
-                    // var li_value = document.createTextNode("zzz");
-                    // var element = document.getElementById("???");
-                    // tag_ul.appendChild(tag_li);
-                    // tag_li.appendChild(li_value)
-                    // element.appendChild(tag_ul);    
-            }
-
-
-
-            document.addEventListener("DOMContentLoaded", lobbies_names); // порядок вызова lobbie_names и lobbies_users не перепутать
-            document.addEventListener("DOMContentLoaded", lobbies_users);
-            setInterval(lobbies_users, 1000);
-        </script>
-    
     </body>
 
 </html>

@@ -20,34 +20,138 @@
     <div id="lobbies_names">
     </div>
 
-    <!-- stable code -->
-    
-   {% for game in games_names %}
-        <!-- lobby's name -->
-        <!-- id is stripped from spaces -->
-        <p id={{ game.replace(" ", "") }}>{{ game }}</p>
-        <!-- list of players -->
-        <ul>
-            {% for user in users_in_lobbies_dict[game] %}
-                <li>{{ user }}</li>
-            {% endfor %}
-        </ul>
-        <form action="/lobbies" method="POST">
-            <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have both quotes and curly braces -->
-            <button class="btn-primary" type="submit">Join lobby</button>
-        </form>
-        <div>
-            <form action="/leave_lobby" method="POST">
-                <input type="hidden" id="game" name="game" value="{{ game }}">  <!-- value= must have both quotes and curly braces -->
-                <button class="btn-primary" type="submit">Leave lobby</button>
-            </form>
-        </div>
-    {% endfor %}
+    <!-- lobbies names -->
+    <!-- should stay in lobbies.html otherwise script will be executed on all pages -->
 
-    <div>
-        <form action="/leave_all_lobbies" method="POST">
-            <button class="btn-primary" type="submit">Leave all lobbies</button>
-        </form>
-    </div>
+    <!-- for some reason I can't refer to javascript.js and therefore call functions from it-->
+    <!-- <script src="http://127.0.0.1/javascript.js" type="text/javascript">lobbies_autoupdate();</script> -->
+
+    <script>
+        // takes response from server and draws <p> with games' names
+        function lobbies_names() {
+            fetch("/lobbies_names")
+            .then(response => response.json())
+            .then(data => {
+                // data is "Object { lobbies_names: ["Overwatch", "Starcraft 2", "Counter-Strike", … ] }"
+                // console.log(data)
+                //console.log(data.lobbies_names)
+                for (el of data.lobbies_names){
+                    // console.log(el)
+                    let tag = document.createElement("p");
+                    tag.setAttribute("id", el.replace(/ /g, ''));
+                    let lobby_name = document.createTextNode(el);
+                    tag.appendChild(lobby_name);
+                    let lobby_name_element = document.getElementById("lobbies_names");
+                    lobby_name_element.appendChild(tag);
+                }
+            })
+        }
+
+        // takes response from server and draws <ul> after <p> from function "lobbies_names"
+        function lobbies_users(){
+            fetch("/lobbies_users")
+            .then(response => response.json())
+            .then(data => {
+                // data is "Object { "Counter-Strike": ["ssss", "xxxx"], "Heroes of the Storm": […], "Hunt: Showdown": […], … }
+                // console.log(data)
+                // console.log(data.lobbies_users)
+                // console.log(data.lobbies_users.Overwatch)
+
+                $.each(data.lobbies_users, function(key, value) {
+                    // console.log(key)
+                    // console.log(value)
+
+                    // ids are generated based on games' names from json, some games have spacebar in the name
+                    let id_without_spaces = key.replace(/ /g, '');
+
+                    // this part is for replacing the old <ul> with new one; without this code page will have new <ul> after old <ul>
+                    try {
+                        let list_of_players = document.getElementById(id_without_spaces + '_ul');
+                        //console.log(list_of_players)
+                        list_of_players.remove();
+                        // console.log(list_of_players.innerHTML)
+                    }
+                    catch(e){
+                        //console.log("error")
+                    }
+
+                    // lobby_name_element is the name of the lobby, <p>Overwatch</p>
+                    // .insertAdjacentHTML creates <ul> and <li> with usernames after <p>
+                    // // "TypeError: lobby_name_element is null" is fine, it just means, that the lobby is empty
+                    let lobby_name_element = document.getElementById(id_without_spaces);
+                    let create_list = lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}><li id=${id_without_spaces + '_li'}>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
+                });
+            })
+        }
+
+
+        function create_buttons(){
+            fetch("/lobbies_names")
+            .then(response => response.json())
+            .then(data => {
+                // data is "Object { lobbies_names: ["Overwatch", "Starcraft 2", "Counter-Strike", … ] }"
+                for (lobby of data.lobbies_names){
+                    console.log(lobby)
+                    let id_without_spaces = lobby.replace(/ /g, '');
+                    try{
+                        let create_button_join_lobby = document.getElementById(`${id_without_spaces + '_ul'}`).insertAdjacentHTML('afterend', `
+                            <div>
+                                <form action="/lobbies" method="POST">
+                                    <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
+                                    <button class="btn-primary" type="submit">Join lobby</button>
+                                </form>
+                            </div>
+                        `);
+                        let create_button_leave_lobby = document.getElementById(`${id_without_spaces + '_ul'}`).insertAdjacentHTML('afterend', `
+                                <div>
+                                    <form action="/leave_lobby" method="POST">
+                                        <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
+                                        <button class="btn-primary" type="submit">Leave lobby</button>
+                                    </form>
+                                </div>
+                        `);
+                    }
+                    catch(e){
+                        if (e instanceof TypeError){
+                            console.log(".getElementById can't find id (that's alright)")
+                            // this is fine, lobby is empty and .getElementById can't find id
+                            console.log(id_without_spaces)
+                            let create_button_join_lobby = document.getElementById(`${id_without_spaces}`).insertAdjacentHTML('afterend', `
+                                <div>
+                                    <form action="/lobbies" method="POST">
+                                        <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
+                                        <button class="btn-primary" type="submit">Join lobby</button>
+                                    </form>
+                                </div>
+                            `);
+                            let create_button_leave_lobby = document.getElementById(`${id_without_spaces}`).insertAdjacentHTML('afterend', `
+                                <div>
+                                    <form action="/leave_lobby" method="POST">
+                                        <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
+                                        <button class="btn-primary" type="submit">Leave lobby</button>
+                                    </form>
+                                </div>
+                            `);
+                        }
+                    } 
+                }
+            });
+
+            let create_button_leave_all_lobbies = document.getElementById('lobbies_names').insertAdjacentHTML('afterend', `
+                <div>
+                    <form action="/leave_all_lobbies" method="POST">
+                        <button class="btn-primary" type="submit">Leave all lobbies</button>
+                    </form>
+                </div>
+            `);
+        }
+
+
+        // order of these functions calls may be important, or may be not
+        document.addEventListener("DOMContentLoaded", lobbies_names);
+        document.addEventListener("DOMContentLoaded", lobbies_users);
+        document.addEventListener("DOMContentLoaded", create_buttons);
+        setInterval(lobbies_users, 5000);
+    </script>
 
 {% endblock main %}
