@@ -37,12 +37,25 @@
                 //console.log(data.lobbies_names)
                 for (el of data.lobbies_names){
                     // console.log(el)
+                    // iterate through the array and create <p>gamename</p> for each element
                     let tag = document.createElement("p");
                     tag.setAttribute("id", el.replace(/ /g, ''));
-                    let lobby_name = document.createTextNode(el);
-                    tag.appendChild(lobby_name);
+                    tag.innerHTML = el;
+                    
+                    // create <li> with default value "Lobby is empty"
+                    let def_ul = document.createElement("ul");
+                    def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
+                    let def_li = document.createElement("li");
+                    def_li.setAttribute("id", "default_li_" + el.replace(/ /g, ''));
+                    def_li.innerHTML = "Lobby is empty";
+
+                    tag.appendChild(def_ul);
+                    def_ul.appendChild(def_li);
+
                     let lobby_name_element = document.getElementById("lobbies_names");
                     lobby_name_element.appendChild(tag);
+                    
+                    //for some reason tag.insertAdjacentHTML('afterend', `<ul'><li'>"Lobby is empty"</li></ul>`); doesn't work
                 }
             })
         }
@@ -63,6 +76,9 @@
 
                     // ids are generated based on games' names from json, some games have spacebar in the name
                     let id_without_spaces = key.replace(/ /g, '');
+
+                    // delete default <ul><li>"Lobby is empty"</ul></li>; really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
+                    document.getElementById("default_ul_" + id_without_spaces).remove()
 
                     // this part is for replacing the old <ul> with new one; without this code page will have new <ul> after old <ul>
                     try {
@@ -91,7 +107,7 @@
             .then(data => {
                 // data is "Object { lobbies_names: ["Overwatch", "Starcraft 2", "Counter-Strike", … ] }"
                 for (lobby of data.lobbies_names){
-                    console.log(lobby)
+                    // console.log(lobby)
                     let id_without_spaces = lobby.replace(/ /g, '');
                     try{
                         let create_button_join_lobby = document.getElementById(`${id_without_spaces + '_ul'}`).insertAdjacentHTML('afterend', `
@@ -145,13 +161,15 @@
                 </div>
             `);
         }
+    </script>
 
-
+    <script>
         // order of these functions calls may be important, or may be not
         document.addEventListener("DOMContentLoaded", lobbies_names);
         document.addEventListener("DOMContentLoaded", lobbies_users);
         document.addEventListener("DOMContentLoaded", create_buttons);
         setInterval(lobbies_users, 5000);
     </script>
+
 
 {% endblock main %}
