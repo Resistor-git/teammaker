@@ -77,8 +77,11 @@
                     // ids are generated based on games' names from json, some games have spacebar in the name
                     let id_without_spaces = key.replace(/ /g, '');
 
-                    // delete default <ul><li>"Lobby is empty"</ul></li>; really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
-                    document.getElementById("default_ul_" + id_without_spaces).remove()
+                    if (document.getElementById("default_ul_" + id_without_spaces) !== null){
+                        // this should be done only when the lobby is empty and has default values (<ul id="default_ul_NaturalSelection2">)
+                        // delete default <ul><li>"Lobby is empty"</ul></li>; really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
+                        document.getElementById("default_ul_" + id_without_spaces).remove()
+                    }
 
                     // this part is for replacing the old <ul> with new one; without this code page will have new <ul> after old <ul>
                     try {
@@ -130,6 +133,7 @@
                     catch(e){
                         if (e instanceof TypeError){
                             console.log(".getElementById can't find id (that's alright)")
+                            console.log(id_without_spaces)
                             // this is fine, lobby is empty and .getElementById can't find id
                             console.log(id_without_spaces)
                             let create_button_join_lobby = document.getElementById(`${id_without_spaces}`).insertAdjacentHTML('afterend', `
