@@ -83,15 +83,11 @@
                         document.getElementById("default_ul_" + id_without_spaces).remove()
                     }
 
-                    // this part is for replacing the old <ul> with new one; without this code page will have new <ul> after old <ul>
-                    try {
+                    // this part is for replacing the old <ul> with new one; without this code page will have new <ul> after old <ul> (aka spam everything with buttons)
+                    if (document.getElementById(id_without_spaces + '_ul')){
                         let list_of_players = document.getElementById(id_without_spaces + '_ul');
-                        //console.log(list_of_players)
                         list_of_players.remove();
                         // console.log(list_of_players.innerHTML)
-                    }
-                    catch(e){
-                        //console.log("error")
                     }
 
                     // lobby_name_element is the name of the lobby, <p>Overwatch</p>
