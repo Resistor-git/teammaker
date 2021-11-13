@@ -220,36 +220,7 @@ def lobbies():
 
     # User reached route via GET (as by clicking a link or via redirect); show all lobbies and users in them
     else:
-        # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-        con = sqlite3.connect('teammaker.db')
-        # create "cursor" object
-        cur = con.cursor()
-
-        # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
-        all_lobbies_and_users = cur.execute("""
-                                            SELECT games.game, users.username
-                                            FROM games
-                                            JOIN lobbies ON games.id = lobbies.game_id
-                                            JOIN users ON users.id = lobbies.user_id
-                                            """).fetchall()
-
-        # list of all games/lobbies (need that to show empty lobbies)
-        raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
-        games_names = []
-        foo = [games_names.append(key[0]) for key in raw_games_names]
-
-        # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
-        # probably there is an easier way using jsonify
-        users_in_lobbies_dict = {}
-        for row in all_lobbies_and_users:
-            if row[0] not in users_in_lobbies_dict.keys():
-                users_in_lobbies_dict[row[0]] = [row[1]]
-            else:
-                users_in_lobbies_dict[row[0]].append(row[1])
-
-        # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
-        con.close()
-        return render_template("/lobbies.html", games_names = games_names, users_in_lobbies_dict = users_in_lobbies_dict)
+        return render_template("/lobbies.html")
 
 
 @app.route("/leave_lobby", methods=["POST"])
@@ -294,39 +265,39 @@ def leave_all_lobbies():
         con.close()
 
 
-def lobby_updater():
-    """Creates json for javascript to automatically update lobbies"""
+# def lobby_updater():
+#     """Creates json for javascript to automatically update lobbies"""
 
-    # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-    con = sqlite3.connect('teammaker.db')
-    # create "cursor" object
-    cur = con.cursor()
+#     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+#     con = sqlite3.connect('teammaker.db')
+#     # create "cursor" object
+#     cur = con.cursor()
 
-    # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
-    all_lobbies_and_users = cur.execute("""
-                                        SELECT games.game, users.username
-                                        FROM games
-                                        JOIN lobbies ON games.id = lobbies.game_id
-                                        JOIN users ON users.id = lobbies.user_id
-                                        """).fetchall()
+#     # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
+#     all_lobbies_and_users = cur.execute("""
+#                                         SELECT games.game, users.username
+#                                         FROM games
+#                                         JOIN lobbies ON games.id = lobbies.game_id
+#                                         JOIN users ON users.id = lobbies.user_id
+#                                         """).fetchall()
 
-    # list of all games/lobbies (need that to show empty lobbies)
-    raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
-    games_names = []
-    foo = [games_names.append(key[0]) for key in raw_games_names]
+#     # list of all games/lobbies (need that to show empty lobbies)
+#     raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
+#     games_names = []
+#     foo = [games_names.append(key[0]) for key in raw_games_names]
 
-    # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
-    # probably there is an easier way using jsonify
-    users_in_lobbies_dict = {}
-    for row in all_lobbies_and_users:
-        if row[0] not in users_in_lobbies_dict.keys():
-            users_in_lobbies_dict[row[0]] = [row[1]]
-        else:
-            users_in_lobbies_dict[row[0]].append(row[1])
+#     # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
+#     # probably there is an easier way using jsonify
+#     users_in_lobbies_dict = {}
+#     for row in all_lobbies_and_users:
+#         if row[0] not in users_in_lobbies_dict.keys():
+#             users_in_lobbies_dict[row[0]] = [row[1]]
+#         else:
+#             users_in_lobbies_dict[row[0]].append(row[1])
 
-    # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
-    con.close()
-    return jsonify(users_in_lobbies_dict = users_in_lobbies_dict, games_names = games_names)
+#     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
+#     con.close()
+#     return jsonify(users_in_lobbies_dict = users_in_lobbies_dict, games_names = games_names)
 
 
 @app.route("/lobbies_names", methods=["GET"])
