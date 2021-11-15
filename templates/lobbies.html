@@ -49,7 +49,7 @@
             })
         }
 
-        
+
         // takes response from server and draws <ul> after <p> from function "lobbies_names"
         function lobbies_users(){
             fetch("/lobbies_users")
@@ -76,7 +76,7 @@
                         document.getElementById("default_ul_" + id_without_spaces).remove();
                         // create new <ul>
                         document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);
-                        let ul = document.getElementById(id_without_spaces + '_ul')
+                        let ul = document.getElementById(id_without_spaces + '_ul');
 
                         for (user of value){
                             ul.insertAdjacentHTML('afterbegin', `<li id=${id_without_spaces + '_li' + '_' + user}>${user}</li>`);
@@ -184,7 +184,16 @@
     <script>
         test_buttons();
 
-        // window.addEventListener('load', starter());
+        window.addEventListener('load', starter);
+        setInterval(() => {
+            updater()    
+        }, 5000);
+        // document.addEventListener("DOMContentLoaded", starter)
+        // document.onreadystatechange = function () {
+        //     if (document.readyState == "interactive") {
+        //         starter();
+        //     }
+        // }
 
         function starter(){
             console.log('(starter) document state:', document.readyState);
@@ -194,9 +203,17 @@
             console.log('lobbies_users is executed');
             create_buttons();
             console.log('create_buttons is executed');
+            console.log('(starter) document state:', document.readyState);
         }
 
-        //starter();
+        function updater(){
+            console.log('(updater) document state:', document.readyState);
+            lobbies_users();
+            console.log('lobbies_users is executed');
+            console.log('(updater) document state:', document.readyState);
+        }
+
+        // starter();
 
         // order of these functions calls may be important, or may be not
         // window. or document. ???
@@ -295,8 +312,8 @@
 
         /*     
         Скрипты, которые не блокируют DOMContentLoaded:
-        Скрипты с атрибутом async не блокируют DOMContentLoaded.
-        Скрипты, сгенерированные динамически при помощи document.createElement('script') и затем добавленные на страницу, также не блокируют это событие.
+        cкрипты с атрибутом async не блокируют DOMContentLoaded.
+        cкрипты, сгенерированные динамически при помощи document.createElement('script') и затем добавленные на страницу, также не блокируют это событие.
 
         Если создать листенер с DOMContentLoaded когда страница уже загузилась, то листенер не сработает ?
         */
