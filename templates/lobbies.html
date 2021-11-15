@@ -5,17 +5,6 @@
 {% endblock title %}
 
 {% block main%}
-            
-    <!-- TODO: maybe rewrite code to execute it clientside?
-    js should take dict/list/cursor object [(game1, users), (game2, users)...] from server and manipulate it
-    document.createElement https://youtu.be/x5trGVMKTdY?list=PLhQjrBD2T380xvFSUmToMMzERZ3qB5Ueu&t=4245-->
-    
-
-
-    <!-- <p id="lobby_name"></p>
-    <ul id="autoupdated_lobby">
-        <li></li>
-    </ul> -->
 
     <div id="lobbies_names">
     </div>
@@ -26,7 +15,7 @@
     <!-- for some reason I can't refer to javascript.js and therefore call functions from it-->
     <!-- <script src="http://127.0.0.1/javascript.js" type="text/javascript">lobbies_autoupdate();</script> -->
 
-    <script>
+    <script defer> // <script defer> ???
         // takes response from server and draws <p> with games' names
         function lobbies_names() {
             fetch("/lobbies_names")
@@ -81,25 +70,23 @@
                     // delete default <ul><li>"Lobby is empty"</ul></li>; really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
                     // this should be done only when the lobby is empty and has default values (<ul id="default_ul_NaturalSelection2">)
                     if (document.getElementById("default_ul_" + id_without_spaces) !== null){
-                        console.log('11111', document.getElementById("default_ul_" + id_without_spaces))
-                        document.getElementById("default_ul_" + id_without_spaces).remove()
+                        console.log('default <ul> detected and will be deleted', document.getElementById("default_ul_" + id_without_spaces));
+                        document.getElementById("default_ul_" + id_without_spaces).remove();
                     // following part is for replacing the old <ul> (if it exists) with new one; without this code page will have new <ul> after old <ul> (aka spam everything with buttons)
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
-                        let list_of_players = document.getElementById(id_without_spaces + '_ul');
-                        list_of_players.remove();
-                        // console.log(list_of_players.innerHTML)
+                        console.log("non-default <ul> detected and will be deleted", document.getElementById(id_without_spaces + '_ul').innerHTML);
+                        document.getElementById(id_without_spaces + '_ul').remove();
+                    // if there is no <ul> at all, then create default <ul>; this should not happen if everything goes as planned
+                    } else {
+                        console.log("Something is wrong, this line was made as a backup if no <ul> was created by lobbies_names()")
+                        document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${'default_ul_' + id_without_spaces}><li id=${'default_li_' + id_without_spaces}>${value}</li></ul>`);
                     }
-                    // // this part is for replacing the old <ul> (if it exists) with new one; without this code page will have new <ul> after old <ul> (aka spam everything with buttons)
-                    // if (document.getElementById(id_without_spaces + '_ul') !== null){
-                    //     let list_of_players = document.getElementById(id_without_spaces + '_ul');
-                    //     list_of_players.remove();
-                    //     // console.log(list_of_players.innerHTML)
-                    // }
 
                     // lobby_name_element is the name of the lobby, <p>Overwatch</p>
                     // .insertAdjacentHTML creates <ul> and <li> with usernames after <p>
                     let lobby_name_element = document.getElementById(id_without_spaces);
-                    //console.log("!!!!!", lobby_name_element)
+                    // console.log('id_without_spaces', id_without_spaces)
+                    // console.log('lobby_name_element', lobby_name_element)
                     let create_list = lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}><li id=${id_without_spaces + '_li'}>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
                     //let create_ul = lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);  // pay attention to `` it is grave accent, not quotes
                     //console.log('!!!!!', create_ul)
@@ -119,84 +106,49 @@
                     let id_without_spaces = lobby.replace(/ /g, '');
 
                     // create buttons for default values
+                    // leave button is not needed, because lobby is already empty
                     if (document.getElementById('default_ul_' + id_without_spaces) !== null){
                         let create_button_join_lobby = document.getElementById('default_ul_' + id_without_spaces).insertAdjacentHTML('afterend', `
                             <div>
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" type="submit">Join lobby</button>
+                                    <button class="btn-primary" id="join_${id_without_spaces}" type="submit">Join lobby</button>
                                 </form>
                             </div>
                         `);
-                        let create_button_leave_lobby = document.getElementById('default_ul_' + id_without_spaces).insertAdjacentHTML('afterend', `
-                            <div>
-                                <form action="/leave_lobby" method="POST">
-                                    <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" type="submit">Leave lobby</button>
-                                </form>
-                            </div>
-                        `);
+                        // // console.log('button_join_lobby created')
+                        // let create_button_leave_lobby = document.getElementById('default_ul_' + id_without_spaces).insertAdjacentHTML('afterend', `
+                        //     <div>
+                        //         <form action="/leave_lobby" method="POST">
+                        //             <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
+                        //             <button class="btn-primary" id="leave_${id_without_spaces} type="submit">Leave lobby</button>
+                        //         </form>
+                        //     </div>
+                        // `);
+                        // // console.log('button_leave_lobby created')
+
                     // create buttons for non-default values
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
                         let create_button_join_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
                             <div>
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" type="submit">Join lobby</button>
+                                    <button class="btn-primary" "join_${id_without_spaces}" type="submit">Join lobby</button>
                                 </form>
                             </div>
                         `);
+                        // console.log('button_join_lobby created')
+
                         let create_button_leave_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
                             <div>
                                 <form action="/leave_lobby" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" type="submit">Leave lobby</button>
+                                    <button class="btn-primary" id="leave_${id_without_spaces} type="submit">Leave lobby</button>
                                 </form>
                             </div>
                         `);
+                        // console.log('button_leave_lobby created')
                     }
-
-                    // try{
-                    //     let create_button_join_lobby = document.getElementById(`${id_without_spaces + '_ul'}`).insertAdjacentHTML('afterend', `
-                    //         <div>
-                    //             <form action="/lobbies" method="POST">
-                    //                 <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                    //                 <button class="btn-primary" type="submit">Join lobby</button>
-                    //             </form>
-                    //         </div>
-                    //     `);
-                    //     let create_button_leave_lobby = document.getElementById(`${id_without_spaces + '_ul'}`).insertAdjacentHTML('afterend', `
-                    //             <div>
-                    //                 <form action="/leave_lobby" method="POST">
-                    //                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                    //                     <button class="btn-primary" type="submit">Leave lobby</button>
-                    //                 </form>
-                    //             </div>
-                    //     `);
-                    // }
-                    // catch(e){
-                    //     if (e instanceof TypeError){
-                    //         console.log(".getElementById can't find id (that's alright, or maybe not...)")
-                    //         console.log(id_without_spaces)
-                    //         // this is fine ?, lobby is empty and .getElementById can't find id
-                    //         let create_button_join_lobby = document.getElementById(`${id_without_spaces}`).insertAdjacentHTML('afterend', `
-                    //             <div>
-                    //                 <form action="/lobbies" method="POST">
-                    //                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                    //                     <button class="btn-primary" type="submit">Join lobby</button>
-                    //                 </form>
-                    //             </div>
-                    //         `);
-                    //         let create_button_leave_lobby = document.getElementById(`${id_without_spaces}`).insertAdjacentHTML('afterend', `
-                    //             <div>
-                    //                 <form action="/leave_lobby" method="POST">
-                    //                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                    //                     <button class="btn-primary" type="submit">Leave lobby</button>
-                    //                 </form>
-                    //             </div>
-                    //         `);
-                    //     }
-                    // } 
                 }
             });
 
@@ -207,10 +159,10 @@
                     </form>
                 </div>
             `);
+            // console.log('button_leave_all_lobbies created')
         }
+        console.log('STATE', document.readyState)
     </script>
-
-
 
 
     <script>
@@ -224,19 +176,119 @@
             let create_button_test_create_buttons = document.getElementById('lobbies_names').insertAdjacentHTML('beforebegin', `
                 <input id="test_create_buttons" type="button" value="create_buttons" onclick="create_buttons();" />
             `);
+            console.log('test buttons finished')
         }
+
     </script>
+
 
     <script>
         // order of these functions calls may be important, or may be not
         // window. or document. ???
-        // window.addEventListener("DOMContentLoaded", lobbies_names);
-        // window.addEventListener("DOMContentLoaded", lobbies_users);
-        // window.addEventListener("DOMContentLoaded", create_buttons);
-        test_buttons()
+        // function starter(){
+        //     window.addEventListener('load', (event) => {
+        //     console.log('page is fully loaded, starter()');
+        //     lobbies_names();
+        //     console.log('lobbies_names is executed');
+        //     lobbies_users();
+        //     console.log('lobbies_users is executed');
+        //     create_buttons();
+        //     console.log('create_buttons is executed');
+        //     });
+        // }
 
-        //window.addEventListener("DOMContentLoaded", function(){setInterval(lobbies_users, 5000)});
-        //window.addEventListener("DOMContentLoaded", function(){create_buttons(lobbies_users, 6000)});
+//         console.log('document state:', document.readyState)
+//         window.addEventListener('load', starter());
+// // не знаю что лучше, вариант выши или ниже, скорее всего всё равно, но в первом мне не понятен (event)
+//         function starter(){
+//             console.log('(starter) document state:', document.readyState)
+//             lobbies_names();
+//             console.log('lobbies_names is executed');
+//             lobbies_users();
+//             console.log('lobbies_users is executed');
+//             create_buttons();
+//             console.log('create_buttons is executed');
+//             // });
+//         }
+
+//         function updater(){
+//             console.log('updater_started')
+//             //lobbies_names();
+//             //console.log('lobbies_names is executed');
+//             lobbies_users();
+//             console.log('update lobbies_users is executed');
+//             //create_buttons();
+//             //console.log('create_buttons is executed');
+//         }
+
+//         // document.addEventListener('DOMContentLoaded', (event) => {
+//         //     console.log('DOMContentLoaded');
+//         //     lobbies_names();
+//         //     console.log('lobbies_names is executed');
+//         //     lobbies_users();
+//         //     console.log('lobbies_users is executed');
+//         //     create_buttons();
+//         //     console.log('create_buttons is executed');
+//         // });
+
+//         test_buttons();
+
+        setTimeout(() => {
+            lobbies_names()
+        }, 1);
+
+        setTimeout(() => {
+            lobbies_users()
+        }, 1.1);
+
+        setTimeout(() => {
+            create_buttons()
+        }, 1.2);
+
+        // console.log('document state:', document.readyState)
+        // window.addEventListener('load', updater());
+        //window.addEventListener("load", function(){setInterval(updater, 5000)});
+        //window.onload = function(){setInterval(updater, 5000)}
+        
+
+        //window.onload = function(){console.log('WINDOW LOADED', window.readyState)}
+        // window.addEventListener and window.onload are almost same, but window.onload can only e used for one function. so use window.addEventListener.
+
+
+        // attempt to update everything after any button is clicked... - fail
+        // document.querySelector('main').getElementsByClassName('btn-primary').addEventListener('click', () => {
+        //     console.log('click')
+        //     lobbies_names();
+        //     console.log('lobbies_names is executed');
+        //     lobbies_users();
+        //     console.log('lobbies_users is executed');
+        //     create_buttons();
+        //     console.log('create_buttons is executed');
+        // });
+
+
+        // setInterval(() => {
+        //     lobbies_names;
+        //     lobbies_users;
+        //     create_buttons;
+        // }, 5000);
+
+
+        //document.addEventListener("DOMContentLoaded", function(){setInterval(updater, 5000)});
+        //document.addEventListener("DOMContentLoaded", function(){create_buttons(lobbies_users, 6000)});
+
+        // window.addEventListener("load", function(){setInterval(updater, 5000)});
+
+
+        /*     
+        Скрипты, которые не блокируют DOMContentLoaded:
+        Скрипты с атрибутом async не блокируют DOMContentLoaded.
+        Скрипты, сгенерированные динамически при помощи document.createElement('script') и затем добавленные на страницу, также не блокируют это событие.
+
+        Если создать листенер с DOMContentLoaded когда страница уже загузилась, то листенер не сработает ?
+        */
+
+
     </script>
 
 
