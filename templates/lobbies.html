@@ -86,6 +86,8 @@
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
                         console.log("non-default <ul> detected and will be deleted", document.getElementById(id_without_spaces + '_ul').innerHTML);
                          for (user of value){
+                            console.log('user', user)
+                            console.log('value', value)
                             let li = document.getElementById(id_without_spaces + '_li' + '_' + user);
                             li.innerText = user;
                         }
@@ -200,13 +202,16 @@
             lobbies_names();
             console.log('lobbies_names is executed');
             setTimeout(() => {
+                // promise https://www.youtube.com/watch?v=1idOY3C1gYU
                 lobbies_users();
-                console.log('lobbies_users is executed'); 
-            }, 500);
-            setTimeout(() => {
+                console.log('lobbies_users is executed');
+                
+                setTimeout(() => {
                 create_buttons();
                 console.log('create_buttons is executed');
-            }, 700);
+                }, 50);
+            }, 400);
+
             console.log('(starter) document state:', document.readyState);
         }
 
@@ -214,6 +219,10 @@
             console.log('(updater) document state:', document.readyState);
             lobbies_users();
             console.log('lobbies_users is executed');
+            setTimeout(() => {
+                create_buttons();
+                console.log('create_buttons is executed');
+                }, 50);
             console.log('(updater) document state:', document.readyState);
         }
 
