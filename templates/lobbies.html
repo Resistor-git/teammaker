@@ -51,4 +51,11 @@
         </form>
     </div>
 
+    <script>
+        // updates whole page every several seconds
+        setInterval(() => {
+            console.log('about to reload')
+            document.location.reload();
+        }, 5000);
+    </script>
 {% endblock main %}
