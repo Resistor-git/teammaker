@@ -199,10 +199,14 @@
             console.log('(starter) document state:', document.readyState);
             lobbies_names();
             console.log('lobbies_names is executed');
-            lobbies_users();
-            console.log('lobbies_users is executed');
-            create_buttons();
-            console.log('create_buttons is executed');
+            setTimeout(() => {
+                lobbies_users();
+                console.log('lobbies_users is executed'); 
+            }, 500);
+            setTimeout(() => {
+                create_buttons();
+                console.log('create_buttons is executed');
+            }, 700);
             console.log('(starter) document state:', document.readyState);
         }
 
