@@ -31,8 +31,8 @@ function lobbies_users(){
         // console.log(data.lobbies_users.Overwatch)
 
         $.each(data.lobbies_users, function(key, value) {
-            // console.log(key)
-            // console.log(value)
+            console.log(key)
+            console.log(value)
 
             // ids are generated based on games' names from json, some games have spacebar in the name
             let id_without_spaces = key.replace(/ /g, '');
