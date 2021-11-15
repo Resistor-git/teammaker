@@ -49,6 +49,7 @@
             })
         }
 
+        
         // takes response from server and draws <ul> after <p> from function "lobbies_names"
         function lobbies_users(){
             fetch("/lobbies_users")
@@ -67,30 +68,28 @@
                     // ids are generated based on games' names from json, some games have spacebar in the name
                     let id_without_spaces = key.replace(/ /g, '');
 
-                    // delete default <ul><li>"Lobby is empty"</ul></li>; really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
+                    // delete default <ul><li>"Lobby is empty"</ul></li> and create new element with non-default value;
+                    // really empty lobbies remain with default value, because their names are not in data/response and therefore not in .each cycle
                     // this should be done only when the lobby is empty and has default values (<ul id="default_ul_NaturalSelection2">)
                     if (document.getElementById("default_ul_" + id_without_spaces) !== null){
                         console.log('default <ul> detected and will be deleted', document.getElementById("default_ul_" + id_without_spaces));
                         document.getElementById("default_ul_" + id_without_spaces).remove();
-                    // following part is for replacing the old <ul> (if it exists) with new one; without this code page will have new <ul> after old <ul> (aka spam everything with buttons)
+                        // create new <ul>
+                        document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);
+                        let ul = document.getElementById(id_without_spaces + '_ul')
+
+                        for (user of value){
+                            ul.insertAdjacentHTML('afterbegin', `<li id=${id_without_spaces + '_li' + '_' + user}>${user}</li>`);
+                        }
+                    
+                    // following part is for replacing the old <ul><li> value with new one;
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
                         console.log("non-default <ul> detected and will be deleted", document.getElementById(id_without_spaces + '_ul').innerHTML);
-                        document.getElementById(id_without_spaces + '_ul').remove();
-                    // if there is no <ul> at all, then create default <ul>; this should not happen if everything goes as planned
-                    } else {
-                        console.log("Something is wrong, this line was made as a backup if no <ul> was created by lobbies_names()")
-                        document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${'default_ul_' + id_without_spaces}><li id=${'default_li_' + id_without_spaces}>${value}</li></ul>`);
+                         for (user of value){
+                            let li = document.getElementById(id_without_spaces + '_li' + '_' + user);
+                            li.innerText = user;
+                        }
                     }
-
-                    // lobby_name_element is the name of the lobby, <p>Overwatch</p>
-                    // .insertAdjacentHTML creates <ul> and <li> with usernames after <p>
-                    let lobby_name_element = document.getElementById(id_without_spaces);
-                    // console.log('id_without_spaces', id_without_spaces)
-                    // console.log('lobby_name_element', lobby_name_element)
-                    let create_list = lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}><li id=${id_without_spaces + '_li'}>${value}</li></ul>`);  // pay attention to `` it is grave accent, not quotes
-                    //let create_ul = lobby_name_element.insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);  // pay attention to `` it is grave accent, not quotes
-                    //console.log('!!!!!', create_ul)
-                    //let create_li = create_ul.insertAdjacentHTML('beforeend', `<li id=${id_without_spaces + '_li'}>${value}</li>`);
                 });
             })
         }
@@ -183,6 +182,22 @@
 
 
     <script>
+        test_buttons();
+
+        // window.addEventListener('load', starter());
+
+        function starter(){
+            console.log('(starter) document state:', document.readyState);
+            lobbies_names();
+            console.log('lobbies_names is executed');
+            lobbies_users();
+            console.log('lobbies_users is executed');
+            create_buttons();
+            console.log('create_buttons is executed');
+        }
+
+        //starter();
+
         // order of these functions calls may be important, or may be not
         // window. or document. ???
         // function starter(){
@@ -199,7 +214,7 @@
 
 //         console.log('document state:', document.readyState)
 //         window.addEventListener('load', starter());
-// // не знаю что лучше, вариант выши или ниже, скорее всего всё равно, но в первом мне не понятен (event)
+// // не знаю что лучше, вариант выше или ниже, скорее всего всё равно, но в первом мне не понятен (event)
 //         function starter(){
 //             console.log('(starter) document state:', document.readyState)
 //             lobbies_names();
@@ -231,19 +246,17 @@
 //         //     console.log('create_buttons is executed');
 //         // });
 
-//         test_buttons();
+        // setTimeout(() => {
+        //     lobbies_names()
+        // }, 1);
 
-        setTimeout(() => {
-            lobbies_names()
-        }, 1);
+        // setTimeout(() => {
+        //     lobbies_users()
+        // }, 1.1);
 
-        setTimeout(() => {
-            lobbies_users()
-        }, 1.1);
-
-        setTimeout(() => {
-            create_buttons()
-        }, 1.2);
+        // setTimeout(() => {
+        //     create_buttons()
+        // }, 1.2);
 
         // console.log('document state:', document.readyState)
         // window.addEventListener('load', updater());
