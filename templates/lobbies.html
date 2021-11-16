@@ -60,10 +60,10 @@
                 // console.log(data.lobbies_users)
                 // console.log(data.lobbies_users.Overwatch)
 
-                $.each(data.lobbies_users, function(key, value) {
+                $.each(data.lobbies_users, function(key, users) {
                     // console.log('data.lobbies_users',data.lobbies_users)
                     // console.log('key',key)
-                    // console.log('value', value)
+                    // console.log('users', users)
 
                     // ids are generated based on games' names from json, some games have spacebar in the name
                     let id_without_spaces = key.replace(/ /g, '');
@@ -74,22 +74,26 @@
                     if (document.getElementById("default_ul_" + id_without_spaces) !== null){
                         console.log('default <ul> detected and will be deleted', document.getElementById("default_ul_" + id_without_spaces));
                         document.getElementById("default_ul_" + id_without_spaces).remove();
-                        // create new <ul>
+                        // create new <ul> after <p>
                         document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);
                         let ul = document.getElementById(id_without_spaces + '_ul');
 
-                        for (user of value){
+                        for (user of users){
                             ul.insertAdjacentHTML('afterbegin', `<li id=${id_without_spaces + '_li' + '_' + user}>${user}</li>`);
                         }
                     
                     // following part is for replacing the old <ul><li> value with new one;
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
                         console.log("non-default <ul> detected and will be deleted", document.getElementById(id_without_spaces + '_ul').innerHTML);
-                         for (user of value){
-                            console.log('user', user)
-                            console.log('value', value)
-                            let li = document.getElementById(id_without_spaces + '_li' + '_' + user);
-                            li.innerText = user;
+                        document.getElementById(id_without_spaces + '_ul').remove()
+                        // create new <ul> after <p>
+                        document.getElementById(id_without_spaces).insertAdjacentHTML('afterend', `<ul id=${id_without_spaces + '_ul'}></ul>`);
+                        let ul = document.getElementById(id_without_spaces + '_ul');
+                        
+                        for (user of users){
+                            // console.log('user', user)
+                            // console.log('users', users)
+                            ul.insertAdjacentHTML('beforeend', `<li id=${id_without_spaces + '_li' + '_' + user}>${user}</li>`);
                         }
                     }
                 });
@@ -219,10 +223,10 @@
             console.log('(updater) document state:', document.readyState);
             lobbies_users();
             console.log('lobbies_users is executed');
-            setTimeout(() => {
-                create_buttons();
-                console.log('create_buttons is executed');
-                }, 50);
+            // setTimeout(() => {
+            //     create_buttons();
+            //     console.log('create_buttons is executed');
+            //     }, 50);
             console.log('(updater) document state:', document.readyState);
         }
 
