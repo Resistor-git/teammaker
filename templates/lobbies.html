@@ -107,8 +107,8 @@
                     let id_without_spaces = lobby.replace(/ /g, '');
                     // find lobby and <li> using name of lobby from list of empty lobbies from db
                     if (document.getElementById(id_without_spaces + '_ul') !== null){
-                        //
                         document.getElementById(id_without_spaces + '_ul').innerHTML = `${'<li id=default_li_' + id_without_spaces + '>' + 'Lobby is empty</li>'}`
+                        document.getElementById(id_without_spaces + '_ul').setAttribute("id", "default_ul_" + id_without_spaces)
                     }
                 }
             })
