@@ -24,27 +24,43 @@
                 // data is "Object { lobbies_names: ["Overwatch", "Starcraft 2", "Counter-Strike", … ] }"
                 // console.log(data)
                 //console.log(data.lobbies_names)
+                // for (el of data.lobbies_names){
+                //     // console.log(el)
+                //     // iterate through the array and create <p>gamename</p> for each element
+                //     let tag = document.createElement("p");
+                //     tag.setAttribute("id", el.replace(/ /g, ''));
+                //     tag.innerHTML = el;
+                    
+                //     // create <li> with default value "Lobby is empty"
+                //     let def_ul = document.createElement("ul");
+                //     def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
+                //     let def_li = document.createElement("li");
+                //     def_li.setAttribute("id", "default_li_" + el.replace(/ /g, ''));
+                //     def_li.innerHTML = "Lobby is empty";
+
+                //     tag.appendChild(def_ul);
+                //     def_ul.appendChild(def_li);
+
+                //     let lobby_name_element = document.getElementById("lobbies_names");
+                //     lobby_name_element.appendChild(tag);
+                    
+                //     //for some reason tag.insertAdjacentHTML('afterend', `<ul'><li'>"Lobby is empty"</li></ul>`); doesn't work
+
                 for (el of data.lobbies_names){
                     // console.log(el)
                     // iterate through the array and create <p>gamename</p> for each element
                     let tag = document.createElement("p");
                     tag.setAttribute("id", el.replace(/ /g, ''));
                     tag.innerHTML = el;
-                    
-                    // create <li> with default value "Lobby is empty"
-                    let def_ul = document.createElement("ul");
-                    def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
-                    let def_li = document.createElement("li");
-                    def_li.setAttribute("id", "default_li_" + el.replace(/ /g, ''));
-                    def_li.innerHTML = "Lobby is empty";
-
-                    tag.appendChild(def_ul);
-                    def_ul.appendChild(def_li);
 
                     let lobby_name_element = document.getElementById("lobbies_names");
                     lobby_name_element.appendChild(tag);
                     
-                    //for some reason tag.insertAdjacentHTML('afterend', `<ul'><li'>"Lobby is empty"</li></ul>`); doesn't work
+                    // create <li> with default value "Lobby is empty"
+                    let def_ul = document.createElement("ul");
+                    def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
+                    def_ul.innerHTML = `${'<li id=default_li_' + el.replace(/ /g, '') + '>' + 'Lobby is empty</li>'}`
+                    lobby_name_element.appendChild(def_ul);
                 }
             })
         }
