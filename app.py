@@ -345,6 +345,20 @@ def lobbies_users():
         else:
             lobbies_users[row[0]].append(row[1])
 
+
+    # list with empty lobbies only
+    raw_empty_lobbies = cur.execute("""
+                                SELECT game FROM games WHERE id NOT IN (SELECT game_id FROM lobbies);
+                                """).fetchall()
+
+    empty_lobbies = []
+    for tuple in raw_empty_lobbies:
+        empty_lobbies.append(tuple[0])
+
+    # same but using List Comprehension
+    # other_empty_lobbies = []
+    # [other_empty_lobbies.append(tuple[0]) for tuple in raw_empty_lobbies]
+
     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
     con.close()
-    return jsonify(lobbies_users = lobbies_users)
+    return jsonify(lobbies_users = lobbies_users, empty_lobbies = empty_lobbies)

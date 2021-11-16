@@ -97,7 +97,30 @@
                         }
                     }
                 });
+
+                // take array of empty lobbies from server and set corresponding <li> to 'Lobby is empty' (ARRAY CONSISTS OF ONLY EMPTY LOBBIES)
+                // this code deals with situation when according to db lobby empty is empty, but frontend doesn't know about it
+                // without these lines lobby will always be populated by one person who left last (until you update whole page manually)
+                for (lobby of data.empty_lobbies){
+                    // console.log(data.empty_lobbies)
+                    // console.log(lobby)
+                    let id_without_spaces = lobby.replace(/ /g, '');
+                    // find lobby and <li> using name of lobby from list of empty lobbies from db
+                    if (document.getElementById(id_without_spaces + '_ul') !== null){
+                        //
+                        document.getElementById(id_without_spaces + '_ul').innerHTML = `${'<li id=default_li_' + id_without_spaces + '>' + 'Lobby is empty</li>'}`
+                    }
+                }
             })
+
+            // // if lobby becomes empty (<ul> has no <li>) - create <li>'Lobby is empty'</>
+            // // .fetch doesn't deal with that, because there are only populated lobbies in array for fetch
+            // let div_lobbies_names = document.getElementById("lobbies_names");
+            // div_lobbies_names.getElementsByTagName("ul");
+            // console.log('!!!', div_lobbies_names.getElementsByTagName("ul"))
+
+ 
+            
         }
 
 
