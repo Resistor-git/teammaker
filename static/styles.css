@@ -28,18 +28,6 @@ main
     text-align: center;
 }
 
-main table
-{
-    /* left-align contents */
-    text-align: left;
-}
-
-main tfoot
-{
-    /* boldface tables' footers */
-    font-weight: bold;
-}
-
 main img
 {
     /* Constrain images on small screens */
@@ -49,3 +37,54 @@ main img
 .small {
   font-size: smaller;
 }
+
+
+/* flexbox container for lobbies */
+#lobbies_names {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    height: 700px;
+
+    border-style: groove;
+    border-color: lightgreen;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: center;
+
+    background-color: lightblue;
+    width: 30%;
+    border-style: dashed;
+}
+
+#lobbies_names ul {
+    flex: 1 0 auto;
+
+    box-sizing: border-box;
+    list-style-type: none;
+    border-style: groove;
+    /* height: 50%; */
+    padding: 1em;
+    margin: 0.5em;
+}
+
+.buttons {
+    border-style: dotted;
+    border-color:rgb(231, 122, 189);
+    margin: 2px;
+    /* align-self: center; */
+}
+
+/* .btn-primary{
+    border-style: double;
+    border-color: red;
+
+    margin: 2px;    
+} */

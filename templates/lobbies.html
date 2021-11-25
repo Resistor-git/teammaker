@@ -22,45 +22,27 @@
             .then(response => response.json())
             .then(data => {
                 // data is "Object { lobbies_names: ["Overwatch", "Starcraft 2", "Counter-Strike", … ] }"
-                // console.log(data)
-                //console.log(data.lobbies_names)
-                // for (el of data.lobbies_names){
-                //     // console.log(el)
-                //     // iterate through the array and create <p>gamename</p> for each element
-                //     let tag = document.createElement("p");
-                //     tag.setAttribute("id", el.replace(/ /g, ''));
-                //     tag.innerHTML = el;
-                    
-                //     // create <li> with default value "Lobby is empty"
-                //     let def_ul = document.createElement("ul");
-                //     def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
-                //     let def_li = document.createElement("li");
-                //     def_li.setAttribute("id", "default_li_" + el.replace(/ /g, ''));
-                //     def_li.innerHTML = "Lobby is empty";
-
-                //     tag.appendChild(def_ul);
-                //     def_ul.appendChild(def_li);
-
-                //     let lobby_name_element = document.getElementById("lobbies_names");
-                //     lobby_name_element.appendChild(tag);
-                    
-                //     //for some reason tag.insertAdjacentHTML('afterend', `<ul'><li'>"Lobby is empty"</li></ul>`); doesn't work
-
                 for (el of data.lobbies_names){
                     // console.log(el)
                     // iterate through the array and create <p>gamename</p> for each element
+                    
+                    let lobbies_container = document.getElementById("lobbies_names");
+
+                    let lobby_div = document.createElement("div");
+                    lobby_div.setAttribute("class", "box");
+                    lobby_div.setAttribute("id", el.replace(/ /g, '') + "_box");
+                    lobbies_container.appendChild(lobby_div);
+
                     let tag = document.createElement("p");
                     tag.setAttribute("id", el.replace(/ /g, ''));
                     tag.innerHTML = el;
-
-                    let lobby_name_element = document.getElementById("lobbies_names");
-                    lobby_name_element.appendChild(tag);
+                    lobby_div.appendChild(tag);
                     
                     // create <li> with default value "Lobby is empty"
                     let def_ul = document.createElement("ul");
                     def_ul.setAttribute("id", "default_ul_" + el.replace(/ /g, ''));
                     def_ul.innerHTML = `${'<li id=default_li_' + el.replace(/ /g, '') + '>' + 'Lobby is empty</li>'}`
-                    lobby_name_element.appendChild(def_ul);
+                    lobby_div.appendChild(def_ul);
                 }
             })
         }
@@ -174,7 +156,7 @@
                     // create buttons for non-default values
                     } else if (document.getElementById(id_without_spaces + '_ul') !== null){
                         let create_button_join_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
-                            <div>
+                            <div class="buttons">
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
                                     <button class="btn-primary" "join_${id_without_spaces}" type="submit">Join lobby</button>
@@ -184,7 +166,7 @@
                         // console.log('button_join_lobby created')
 
                         let create_button_leave_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
-                            <div>
+                            <div class=buttons>
                                 <form action="/leave_lobby" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
                                     <button class="btn-primary" id="leave_${id_without_spaces} type="submit">Leave lobby</button>
@@ -197,7 +179,7 @@
             });
 
             let create_button_leave_all_lobbies = document.getElementById('lobbies_names').insertAdjacentHTML('afterend', `
-                <div>
+                <div class=buttons>
                     <form action="/leave_all_lobbies" method="POST">
                         <button class="btn-primary" type="submit">Leave all lobbies</button>
                     </form>
@@ -227,144 +209,42 @@
 
 
     <script>
-        test_buttons();
+        // test_buttons();
 
         window.addEventListener('load', starter);
+
         setInterval(() => {
             updater()    
         }, 5000);
-        // document.addEventListener("DOMContentLoaded", starter)
-        // document.onreadystatechange = function () {
-        //     if (document.readyState == "interactive") {
-        //         starter();
-        //     }
-        // }
 
+
+        // called every time page is reloaded: f5, log in/log/out, join/leave lobby
         function starter(){
             console.log('(starter) document state:', document.readyState);
             lobbies_names();
             console.log('lobbies_names is executed');
             setTimeout(() => {
+                // execute 400 ms after lobbies_names()
                 // promise https://www.youtube.com/watch?v=1idOY3C1gYU
                 lobbies_users();
                 console.log('lobbies_users is executed');
                 
                 setTimeout(() => {
-                create_buttons();
-                console.log('create_buttons is executed');
-                }, 50);
+                    // execute 100 ms after lobbies_users(); some delay is nesessary, bugs at 0 ms
+                    create_buttons();
+                    console.log('create_buttons is executed');
+                }, 100);
             }, 400);
-
             console.log('(starter) document state:', document.readyState);
         }
+
 
         function updater(){
             console.log('(updater) document state:', document.readyState);
             lobbies_users();
             console.log('lobbies_users is executed');
-            // setTimeout(() => {
-            //     create_buttons();
-            //     console.log('create_buttons is executed');
-            //     }, 50);
             console.log('(updater) document state:', document.readyState);
         }
-
-        // starter();
-
-        // order of these functions calls may be important, or may be not
-        // window. or document. ???
-        // function starter(){
-        //     window.addEventListener('load', (event) => {
-        //     console.log('page is fully loaded, starter()');
-        //     lobbies_names();
-        //     console.log('lobbies_names is executed');
-        //     lobbies_users();
-        //     console.log('lobbies_users is executed');
-        //     create_buttons();
-        //     console.log('create_buttons is executed');
-        //     });
-        // }
-
-//         console.log('document state:', document.readyState)
-//         window.addEventListener('load', starter());
-// // не знаю что лучше, вариант выше или ниже, скорее всего всё равно, но в первом мне не понятен (event)
-//         function starter(){
-//             console.log('(starter) document state:', document.readyState)
-//             lobbies_names();
-//             console.log('lobbies_names is executed');
-//             lobbies_users();
-//             console.log('lobbies_users is executed');
-//             create_buttons();
-//             console.log('create_buttons is executed');
-//             // });
-//         }
-
-//         function updater(){
-//             console.log('updater_started')
-//             //lobbies_names();
-//             //console.log('lobbies_names is executed');
-//             lobbies_users();
-//             console.log('update lobbies_users is executed');
-//             //create_buttons();
-//             //console.log('create_buttons is executed');
-//         }
-
-//         // document.addEventListener('DOMContentLoaded', (event) => {
-//         //     console.log('DOMContentLoaded');
-//         //     lobbies_names();
-//         //     console.log('lobbies_names is executed');
-//         //     lobbies_users();
-//         //     console.log('lobbies_users is executed');
-//         //     create_buttons();
-//         //     console.log('create_buttons is executed');
-//         // });
-
-        // setTimeout(() => {
-        //     lobbies_names()
-        // }, 1);
-
-        // setTimeout(() => {
-        //     lobbies_users()
-        // }, 1.1);
-
-        // setTimeout(() => {
-        //     create_buttons()
-        // }, 1.2);
-
-        // console.log('document state:', document.readyState)
-        // window.addEventListener('load', updater());
-        //window.addEventListener("load", function(){setInterval(updater, 5000)});
-        //window.onload = function(){setInterval(updater, 5000)}
-        
-
-        //window.onload = function(){console.log('WINDOW LOADED', window.readyState)}
-        // window.addEventListener and window.onload are almost same, but window.onload can only e used for one function. so use window.addEventListener.
-
-
-        // attempt to update everything after any button is clicked... - fail
-        // document.querySelector('main').getElementsByClassName('btn-primary').addEventListener('click', () => {
-        //     console.log('click')
-        //     lobbies_names();
-        //     console.log('lobbies_names is executed');
-        //     lobbies_users();
-        //     console.log('lobbies_users is executed');
-        //     create_buttons();
-        //     console.log('create_buttons is executed');
-        // });
-
-
-        // setInterval(() => {
-        //     lobbies_names;
-        //     lobbies_users;
-        //     create_buttons;
-        // }, 5000);
-
-
-        //document.addEventListener("DOMContentLoaded", function(){setInterval(updater, 5000)});
-        //document.addEventListener("DOMContentLoaded", function(){create_buttons(lobbies_users, 6000)});
-
-        // window.addEventListener("load", function(){setInterval(updater, 5000)});
-
 
         /*     
         Скрипты, которые не блокируют DOMContentLoaded:
