@@ -138,7 +138,7 @@
                             <div>
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" id="join_${id_without_spaces}" type="submit">Join lobby</button>
+                                    <button id="join_${id_without_spaces}" type="submit">Join lobby</button>
                                 </form>
                             </div>
                         `);
@@ -159,7 +159,7 @@
                             <div class="buttons">
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" "join_${id_without_spaces}" type="submit">Join lobby</button>
+                                    <button "join_${id_without_spaces}" type="submit">Join lobby</button>
                                 </form>
                             </div>
                         `);
@@ -169,7 +169,7 @@
                             <div class=buttons>
                                 <form action="/leave_lobby" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                                    <button class="btn-primary" id="leave_${id_without_spaces} type="submit">Leave lobby</button>
+                                    <button id="leave_${id_without_spaces} type="submit">Leave lobby</button>
                                 </form>
                             </div>
                         `);
@@ -181,7 +181,7 @@
             let create_button_leave_all_lobbies = document.getElementById('lobbies_names').insertAdjacentHTML('afterend', `
                 <div class=buttons>
                     <form action="/leave_all_lobbies" method="POST">
-                        <button class="btn-primary" type="submit">Leave all lobbies</button>
+                        <button id="leave_all_lobbies_button" type="submit">Leave all lobbies</button>
                     </form>
                 </div>
             `);

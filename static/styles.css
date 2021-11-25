@@ -66,7 +66,6 @@ main img
     justify-content: space-between;
     align-content: center;
 
-    background-color: lightblue;
     width: 30%;
     border-style: dashed;
 }
@@ -80,6 +79,8 @@ main img
     /* height: 50%; */
     padding: 1em;
     margin: 0.5em;
+
+    background-color: lightblue;
 }
 
 .buttons {
@@ -87,6 +88,29 @@ main img
     border-color:rgb(231, 122, 189);
     margin: 2px;
     /* align-self: center; */
+}
+
+button {
+    color: white;
+    background-color: rgb(0, 110, 255);
+
+    border-radius:  10% / 50%;
+    border-style: none;
+
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+
+}
+
+#leave_all_lobbies_button {
+    padding-left: 10em;
+    padding-right: 10em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+
+    margin: 1em;
 }
 
 /* .btn-primary{
