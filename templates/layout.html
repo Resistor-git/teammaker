@@ -78,6 +78,16 @@
 
         <!-- jquery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+        <!-- hides and removes the alert (flash) message -->
+        <script>
+            window.setTimeout(function() {
+                $(".alert").fadeTo(2000, 0, function(){
+                    $(".alert").remove()
+                })
+            }, 4000);
+        </script>
+
     </body>
 
 </html>
