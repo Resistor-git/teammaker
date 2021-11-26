@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Profile
+{% endblock title %}
+
+{% block main%}
+    <p>Current user's name: {{ username }}</p>
+    <div id="password_change">
+        <p>Change your password</p>
+        <form action="/change_password" method="POST">
+            <label for="new_password">New password:</label>
+            <input autocomplete="off" class="form-control" name="new_password" placeholder="New password" type="password">
+            <label for="confirmation">Confirm your new password:</label>
+            <input autocomplete="off" class="form-control" name="confirmation" placeholder="Confirm your new password" type="password">
+            <button class="buttons_profile" type="submit">Change password</button>
+        </form>
+        <p>
+            <span class="small">symbols allowed in password: decimals, latin letters (upper or lowercase), symbols: @#$%^&+=</span>
+        </p>
+    </div>
+{% endblock main %}

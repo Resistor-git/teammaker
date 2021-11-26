@@ -123,6 +123,8 @@ button {
     font-size: large;
 }
 
+/* logos */
+
 #Overwatch::after{
     content: "\A" url("/static/logos/32px_overwatch_logo.png");
     /* height: 32px;
@@ -155,3 +157,6 @@ p[id^=Hunt]::after{
     content: "\A" url("/static/logos/32px_hunt_logo_new.png");
     white-space: pre;
 }
+
+/* flexbox container for password change in profile */
+/* TODO */

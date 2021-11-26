@@ -362,3 +362,54 @@ def lobbies_users():
     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
     con.close()
     return jsonify(lobbies_users = lobbies_users, empty_lobbies = empty_lobbies)
+
+
+@app.route("/profile", methods=["GET"])
+@login_required
+def profile():    
+    """Shows profile page"""
+    if request.method == "GET":
+        # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
+        con = sqlite3.connect('teammaker.db')
+        # create "cursor" object
+        cur = con.cursor()
+
+        # session is kinda like a dictionary... can't find exact info in docs right now, anyways, it stores user_id when user is logged in
+        user_id = session["user_id"]
+        # cur.execute(...) returns a list of tuples [('username',]; so [0][0] is user's username from database table "users"
+        username = cur.execute("SELECT username FROM users WHERE id = :id", {"id" : user_id}).fetchall()[0][0]
+
+        con.close()
+        return render_template("profile.html", username = username)
+
+
+@app.route("/change_password", methods=["POST"])
+@login_required
+def change_password():
+    """Changes password"""
+    # 1 check that new_password has necessary length and symbols
+    # 2 check that new_password and confirmation are same
+    # 3 check that old password is correct - don't know how to do this, cashes are obviously different, thanks to salt
+    # 4 change password 
+
+    con = sqlite3.connect('teammaker.db')
+    cur = con.cursor()
+
+    new_password = request.form.get("new_password")
+    confirmation = request.form.get("confirmation")
+
+    # check new_password with regex: only allowed symbols, at least 4 of them, maximum 20 symbols
+    if not re.fullmatch(r'[A-Za-z0-9@#$%^&+=]{4,20}', new_password):
+        return ("Password must have 4-20 symbols, allowed symbols: decimals, latin letters (upper or lowercase), @#$%^&+=")
+    else:
+        if new_password != confirmation:
+            return ("New password and confirmation do not match. Please try again.")
+        else:
+            new_hash = generate_password_hash(new_password, method='pbkdf2:sha256', salt_length=16)
+            cur.execute("UPDATE users SET password_hash = :password_hash WHERE id = :id", {"password_hash" : new_hash, "id" : session["user_id"]})
+            con.commit()
+            con.close()            
+            flash("Password has been changed succesfully")
+            return redirect("/profile")
+
+        
