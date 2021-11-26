@@ -135,7 +135,7 @@
                     // leave button is not needed, because lobby is already empty
                     if (document.getElementById('default_ul_' + id_without_spaces) !== null){
                         let create_button_join_lobby = document.getElementById('default_ul_' + id_without_spaces).insertAdjacentHTML('afterend', `
-                            <div>
+                            <div class="buttons">
                                 <form action="/lobbies" method="POST">
                                     <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
                                     <button id="join_${id_without_spaces}" type="submit">Join lobby</button>

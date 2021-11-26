@@ -47,7 +47,7 @@ main img
     justify-content: space-between;
     align-content: space-between;
 
-    height: 700px;
+    /* height: 700px; */
     width: auto;
 
     margin-top: 1%;
@@ -68,6 +68,11 @@ main img
 
     width: 30%;
     border-style: dashed;
+
+    margin-top: 1%;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
 }
 
 #lobbies_names ul {
@@ -113,9 +118,40 @@ button {
     margin: 1em;
 }
 
-/* .btn-primary{
-    border-style: double;
-    border-color: red;
+#lobbies_names p {
+    font-weight: bold;
+    font-size: large;
+}
 
-    margin: 2px;    
-} */
+#Overwatch::after{
+    content: "\A" url("/static/logos/32px_overwatch_logo.png");
+    /* height: 32px;
+    width: 32px; */
+    white-space: pre;
+}
+
+#Starcraft2::after{
+    content: "\A" url("/static/logos/32px_sc2_logo.png");
+    white-space: pre;
+}
+
+#Counter-Strike::after{
+    content: "\A" url("/static/logos/32px_cs_logo.png");
+    white-space: pre;
+}
+
+#NaturalSelection2::after{
+    content: "\A" url("/static/logos/32px_ns2_logo.png");
+    white-space: pre;
+}
+
+#HeroesoftheStorm::after{
+    content: "\A" url("/static/logos/32px_hots_logo.png");
+    white-space: pre;
+}
+
+p[id^=Hunt]::after{
+    /*id="Hunt:Showdown" - yep, wtih colon... so I can't use id as it is*/
+    content: "\A" url("/static/logos/32px_hunt_logo_new.png");
+    white-space: pre;
+}
