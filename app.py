@@ -167,7 +167,7 @@ def login():
 def logout():
     """Log user out"""
 
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     cur = con.cursor()
     user_id = session["user_id"]
     
