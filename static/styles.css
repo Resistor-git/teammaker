@@ -49,7 +49,7 @@ main img
 
     /* height: 700px; */
     width: auto;
-
+ 
     margin-top: 1%;
     margin-left: 12%;
     margin-right: 12%;
@@ -76,6 +76,7 @@ main img
 }
 
 #lobbies_names ul {
+    /* display: flex; */
     flex: 1 0 auto;
 
     box-sizing: border-box;
@@ -89,10 +90,16 @@ main img
 }
 
 .buttons {
+    /* display: flex;
+    flex: 1 1 auto; */
+    /* box-sizing: border-box; */
+
     border-style: dotted;
     border-color:rgb(231, 122, 189);
     margin: 2px;
     /* align-self: center; */
+
+
 }
 
 button {
@@ -107,6 +114,8 @@ button {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 
+    border-style: dotted;
+    border-color:rgb(122, 231, 122);
 }
 
 #leave_all_lobbies_button {
