@@ -33,7 +33,7 @@ def register():
     """Register user"""
 
     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     # create "cursor" object
     cur = con.cursor()
 
@@ -113,7 +113,7 @@ def login():
     """Log user in"""
 
     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     # create "cursor" object
     cur = con.cursor()
 
@@ -183,7 +183,7 @@ def lobbies():
         # if anytime I would want to allow the user to join only one lobby - change "lobbies" table in DB - make "user_id" UNIQUE
 
         # ???do i need it here??? create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-        con = sqlite3.connect('teammaker.db')
+        con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
         # ???do i need it here??? create "cursor" object
         cur = con.cursor()
 
@@ -228,7 +228,7 @@ def lobbies():
 def leave_lobby():
     """Leave one particular lobby"""
 
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     user_id = session["user_id"]
     # get name of the game from html and convert it to game_id from db;
     # fetchall() returns list of tuples [(id,)]
@@ -252,7 +252,7 @@ def leave_all_lobbies():
     """Leave all lobbies"""
 
     user_id = session["user_id"]
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     
     # if everything is fine code in "try" is executed and transaction is commited, if something goes wrong "with" rolls db back; "finally" closes db and is executed either way
     try:
@@ -305,7 +305,7 @@ def lobbies_names():
     """Creates json for javascript with only names of lobbies (empty encluded)"""
     
     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     # create "cursor" object
     cur = con.cursor()
 
@@ -324,7 +324,7 @@ def lobbies_users():
     """Creates json for javascript with users in lobbies {game1 : [user1, user2], game2 : [user3, user4]}"""
 
     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     # create "cursor" object
     cur = con.cursor()
 
@@ -370,7 +370,7 @@ def profile():
     """Shows profile page"""
     if request.method == "GET":
         # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-        con = sqlite3.connect('teammaker.db')
+        con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
         # create "cursor" object
         cur = con.cursor()
 
@@ -392,7 +392,7 @@ def change_password():
     # 3 check that old password is correct - don't know how to do this, cashes are obviously different, thanks to salt
     # 4 change password 
 
-    con = sqlite3.connect('teammaker.db')
+    con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
     cur = con.cursor()
 
     new_password = request.form.get("new_password")
