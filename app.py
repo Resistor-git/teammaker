@@ -167,6 +167,14 @@ def login():
 def logout():
     """Log user out"""
 
+    con = sqlite3.connect('teammaker.db')
+    cur = con.cursor()
+    user_id = session["user_id"]
+    
+    cur.execute("DELETE FROM lobbies WHERE user_id = :user_id", {"user_id" : user_id})
+    con.commit()
+    con.close()
+
     # Clear any user_id
     session.clear()
 
