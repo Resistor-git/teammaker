@@ -11,6 +11,32 @@ default order:
 */
 
 
+// user_info_variable has information about current user: username, id (same as "session['user_id]" and id in database)
+// user_info_variable is updated by user_info()
+// data received from server - Object { user_id: 5, username: "1111" }
+// I know that global variables are bad, especially when they are not constants
+var user_info_variable = null;
+
+function user_info() {
+    fetch("/user_info")
+    .then(response => response.json())
+    .then(data => {
+        // console.log("INFORMATION ABOUT USER", data);
+        user_info_variable = data;
+    })
+} 
+
+
+// const user_info_variable = (function() {
+//     fetch("/user_info")
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log("INFORMATION ABOUT USER", data);
+//         return data;
+//     });
+// })() 
+
+
 // takes response from server and draws <p> with games' names
 function lobbies_names() {
     fetch("/lobbies_names")
@@ -137,16 +163,6 @@ function create_buttons(){
                         </form>
                     </div>
                 `);
-                // // console.log('button_join_lobby created')
-                // let create_button_leave_lobby = document.getElementById('default_ul_' + id_without_spaces).insertAdjacentHTML('afterend', `
-                //     <div>
-                //         <form action="/leave_lobby" method="POST">
-                //             <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
-                //             <button class="btn-primary" id="leave_${id_without_spaces} type="submit">Leave lobby</button>
-                //         </form>
-                //     </div>
-                // `);
-                // // console.log('button_leave_lobby created')
 
             // create buttons for non-default values
             } else if (document.getElementById(id_without_spaces + '_ul') !== null){
@@ -160,7 +176,13 @@ function create_buttons(){
                 `);
                 // console.log('button_join_lobby created')
 
-                let create_button_leave_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
+                // creates button only if user is in the lobby
+                // document.getElementById(...).textContent returns a string with all users inside <ul> ('testuser1user2nospacesatall')
+                // .search(username of the current user) returns -1 if username was not found in <ul>, or index (0,1,2,...) if was found
+                // the way .search() works may lead to situations when button is created when it sould be not, example: username = "1111" and he is not in lobby, but there is another user called "vasya1111" who is in lobby
+                if (document.getElementById(id_without_spaces + '_ul').textContent.search(`${user_info_variable['username']}`) != -1){
+                    // console.log("!!!!!!", document.getElementById(id_without_spaces + '_ul').textContent.search(`${user_info_variable['username']}`))
+                    let create_button_leave_lobby = document.getElementById(id_without_spaces + '_ul').insertAdjacentHTML('afterend', `
                     <div class=buttons>
                         <form action="/leave_lobby" method="POST">
                             <input type="hidden" id="game" name="game" value="${lobby}">  <!-- here value should be written same as in db and in json from server, it should contain spaces -->
@@ -169,6 +191,7 @@ function create_buttons(){
                     </div>
                 `);
                 // console.log('button_leave_lobby created')
+                }
             }
         }
     });
@@ -210,8 +233,10 @@ setInterval(() => {
 }, 5000);
 
 
-// called every time page is reloaded: f5, log in/log/out, join/leave lobby
+// called every time page is reloaded: f5, log in/log out, join/leave lobby
 function starter(){
+    user_info()
+    
     console.log('(starter) document state:', document.readyState);
     lobbies_names();
     console.log('lobbies_names is executed');

@@ -421,3 +421,21 @@ def change_password():
             return redirect("/profile")
 
         
+@app.route("/user_info", methods=["GET"])
+def user_info():
+    try:
+        user_id = session["user_id"]
+        print(user_id)
+        
+        con = sqlite3.connect('teammaker.db')
+        cur = con.cursor()
+        
+        username = cur.execute("SELECT username FROM users WHERE id = :id", {"id" : user_id}).fetchall()[0][0]
+        # print(username)
+
+        con.close()
+
+        return jsonify(user_id = user_id, username = username)
+    except KeyError:
+        # print("no user_id")
+        return jsonify("no user_id")
