@@ -1,3 +1,16 @@
+/* pay attention to order of functions and when they are called, it may be important
+default order:
+    function lobbies_names()
+    function lobbies_users()
+    function create_buttons()
+    function test_buttons()
+    window.addEventListener('load', starter);
+    setInterval(() => {updater()}, 5000);
+    function starter()
+    function updater()
+*/
+
+
 // takes response from server and draws <p> with games' names
 function lobbies_names() {
     fetch("/lobbies_names")
