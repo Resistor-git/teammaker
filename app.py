@@ -420,4 +420,23 @@ def change_password():
             flash("Password has been changed succesfully")
             return redirect("/profile")
 
+
+@app.route("/user_info", methods=["GET"])
+def user_info():
+    """Creates json with information about current user: { user_id: 5, username: "1111" }"""
+    try:
+        # session is kinda like a dictionary... can't find exact info in docs right now, anyways, it stores user_id when user is logged in
+        user_id = session["user_id"]
         
+        con = sqlite3.connect('teammaker.db')
+        cur = con.cursor()
+        
+        # cur.execute(...) returns a list of tuples [('username',]; so [0][0] is user's username from database table "users"
+        username = cur.execute("SELECT username FROM users WHERE id = :id", {"id" : user_id}).fetchall()[0][0]
+
+        con.close()
+
+        return jsonify(user_id = user_id, username = username)
+    # if user is not logged in, then session["user_id"] doesn't exist and KeyError is raised     
+    except KeyError:
+        return jsonify("no user_id")
