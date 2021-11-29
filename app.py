@@ -428,7 +428,7 @@ def user_info():
         # session is kinda like a dictionary... can't find exact info in docs right now, anyways, it stores user_id when user is logged in
         user_id = session["user_id"]
         
-        con = sqlite3.connect('teammaker.db')
+        con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
         cur = con.cursor()
         
         # cur.execute(...) returns a list of tuples [('username',]; so [0][0] is user's username from database table "users"
