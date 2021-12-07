@@ -148,7 +148,7 @@ def login():
 
         # Remember which user has logged in
         # search_for_login returns a list of tuples [(id, 'username', 'password_hash', 'login')]; so [0][0] is user's id from database table "users"
-        session["user_id"] = login[0][0]
+        session["user_id"] = search_for_login[0][0]
 
         # Show message
         flash('You were successfully logged in')
