@@ -123,32 +123,32 @@ def login():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return "must provide username"
+        # Ensure login was submitted
+        if not request.form.get("login"):
+            return "must provide login"
 
         # Ensure password was submitted
         elif not request.form.get("password"):
             return "must provide password"
 
-        # Query database for username
-        search_for_username = cur.execute("SELECT * FROM users WHERE username = :username", {"username" : request.form.get("username")}).fetchall()
-        # print("MYDEBUG", search_for_username)
+        # Query database for login
+        search_for_login = cur.execute("SELECT * FROM users WHERE login = :login", {"login" : request.form.get("login")}).fetchall()
+        # print("MYDEBUG", search_for_login)
 
-        # Ensure username exists and password is correct
-        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; check_password_hash returns True or False (password_hash, provided password)
-        if not search_for_username or not check_password_hash(search_for_username[0][2], request.form.get("password")):
+        # Ensure login exists and password is correct
+        # search_for_login returns a list of tuples [(id, 'username', 'password_hash', 'login')]; check_password_hash returns True or False (password_hash, provided password)
+        if not search_for_login or not check_password_hash(search_for_login[0][2], request.form.get("password")):
             return "invalid username and/or password"
 
         #TEST STRINGS
         # if not search_for_username:
         #     return "invalid username"
-        # if not check_password_hash(search_for_username[0][2], request.form.get("password")):
+        # if not check_password_hash(search_for_login[0][2], request.form.get("password")):
         #     return "wrong password"
 
         # Remember which user has logged in
-        # search_for_username returns a list of tuples [(id, 'username', 'password_hash', 'login')]; so [0][0] is user's id from database table "users"
-        session["user_id"] = search_for_username[0][0]
+        # search_for_login returns a list of tuples [(id, 'username', 'password_hash', 'login')]; so [0][0] is user's id from database table "users"
+        session["user_id"] = login[0][0]
 
         # Show message
         flash('You were successfully logged in')
