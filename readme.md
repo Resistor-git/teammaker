@@ -110,12 +110,18 @@ File “js_scripts” is responsible for rendering and updating the main content
     
     • updater() - constantly calls function `lobbies_users()` in order to update the list of users inside the lobbies. Which in its turn leads to creation or removal of buttons and etc. Called every several seconds (5 by default) by another anonymous function `setInterval(() => {updater()}, 5000)`.
 
-Appendix:
+### Appendix:
 
-working with database using sqlite3
+Working with database using sqlite3
 
-    1. For a comprehensive guide check https://docs.python.org/3/library/sqlite3.html. Simple version: create 'connection' to the database con = sqlite3.connect('path_to_db').
+For a comprehensive guide check https://docs.python.org/3/library/sqlite3.html. Simple version:
+
+    1. Create 'connection' to the database con = sqlite3.connect('path_to_db').
+    
     2. Create 'cursor' object cur = con.cursor().
+    
     3. Execute sql inquiry cur.execute('SELECT foo FROM bar…').
+    
     4. If the inquiry has changed the database - commit changes using con.commit.
+    
     5. Close connection to the database con.close().
