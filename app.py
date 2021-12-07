@@ -190,22 +190,18 @@ def lobbies():
     if request.method == "POST":
         # if anytime I would want to allow the user to join only one lobby - change "lobbies" table in DB - make "user_id" UNIQUE
 
-        # ???do i need it here??? create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
         con = sqlite3.connect('/home/Resistor/teammaker/teammaker.db')
-        # ???do i need it here??? create "cursor" object
         cur = con.cursor()
 
+        # checks that user is logged in
         try:
             user_id = session["user_id"]
-            # ??? how do i get game_id from submit? <input type="hidden" id="game_id" name="game_id" value="1"> ?
         except KeyError:
             flash("In order to join lobby you must be logged in")  # for some reason this line doesn't work
             return redirect("/login")
 
         #game_id = request.form.get("game_id")
         game = request.form.get("game")
-
-        #lobby_name = request.form.get("lobby_name")  # ??? what does a button return ???
 
         # user is already in the lobby if inquiry returns anything except an empty list;
         # here we take user's id and game's name, then check if both are already in the lobby table at the same line
@@ -273,41 +269,6 @@ def leave_all_lobbies():
         con.close()
 
 
-# def lobby_updater():
-#     """Creates json for javascript to automatically update lobbies"""
-
-#     # create "connection" object that represents db; https://docs.python.org/3/library/sqlite3.html
-#     con = sqlite3.connect('teammaker.db')
-#     # create "cursor" object
-#     cur = con.cursor()
-
-#     # .fetchall returns a list of tuples, result of .execute; cursor object can also be iterated
-#     all_lobbies_and_users = cur.execute("""
-#                                         SELECT games.game, users.username
-#                                         FROM games
-#                                         JOIN lobbies ON games.id = lobbies.game_id
-#                                         JOIN users ON users.id = lobbies.user_id
-#                                         """).fetchall()
-
-#     # list of all games/lobbies (need that to show empty lobbies)
-#     raw_games_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
-#     games_names = []
-#     foo = [games_names.append(key[0]) for key in raw_games_names]
-
-#     # dictionary with lists of all users sorted to corresponding games {game1 : [user1, user2], game2 : [user3, user4]}
-#     # probably there is an easier way using jsonify
-#     users_in_lobbies_dict = {}
-#     for row in all_lobbies_and_users:
-#         if row[0] not in users_in_lobbies_dict.keys():
-#             users_in_lobbies_dict[row[0]] = [row[1]]
-#         else:
-#             users_in_lobbies_dict[row[0]].append(row[1])
-
-#     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
-#     con.close()
-#     return jsonify(users_in_lobbies_dict = users_in_lobbies_dict, games_names = games_names)
-
-
 @app.route("/lobbies_names", methods=["GET"])
 def lobbies_names():
     """Creates json for javascript with only names of lobbies (empty encluded)"""
@@ -318,9 +279,9 @@ def lobbies_names():
     cur = con.cursor()
 
     # list of all games/lobbies (need that to show empty lobbies)
-    raw_lobbys_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
+    raw_lobbies_names = cur.execute("SELECT game FROM games").fetchall() #[(ow), (sc), (ns)]
     lobbies_names = []
-    foo = [lobbies_names.append(key[0]) for key in raw_lobbys_names]
+    foo = [lobbies_names.append(key[0]) for key in raw_lobbies_names]
 
     # when should I con.close() ??? "with ... as ..." only commits the cursor, db should still be closed manually
     con.close()

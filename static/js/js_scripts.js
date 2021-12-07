@@ -126,10 +126,7 @@ function lobbies_users(){
     // // .fetch doesn't deal with that, because there are only populated lobbies in array for fetch
     // let div_lobbies_names = document.getElementById("lobbies_names");
     // div_lobbies_names.getElementsByTagName("ul");
-    // console.log('!!!', div_lobbies_names.getElementsByTagName("ul"))
-
-
-    
+    // console.log('!!!', div_lobbies_names.getElementsByTagName("ul"))    
 }
 
 
@@ -242,15 +239,15 @@ function starter(){
             console.log('create_buttons is executed');
         }, 100);
     }, 400);
-    console.log('(starter) document state:', document.readyState);
+    // console.log('(starter) document state:', document.readyState);
 }
 
 
 function updater(){
-    console.log('(updater) document state:', document.readyState);
+    // console.log('(updater) document state:', document.readyState);
     lobbies_users();
-    console.log('lobbies_users is executed');
-    console.log('(updater) document state:', document.readyState);
+    // console.log('lobbies_users is executed');
+    // console.log('(updater) document state:', document.readyState);
 }
 
 /*     
