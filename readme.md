@@ -4,6 +4,8 @@ Teammaker is a service created to help people gather to play games.
 The idea is simple: if you want to find a teammate or opponent you visit the site, check who is in lobbies and join.
 
 Teammaker does not provide any additional services like chat, friendlist, game launch directly from the page or whatsoever.
+
+Promotional video (kinda) https://youtu.be/yO7J-L_XJ3I
 ## Structure (tree)
     • Main page (lobbies)
     • Profile
